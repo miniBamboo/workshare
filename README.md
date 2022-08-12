@@ -32,7 +32,7 @@ It's compatible with Ethereum's ecosystem.
 
 ### Requirements
 
-Luckyshare requires `Go` 1.13+ and `C` compiler to build. To install `Go`, follow this [link](https://golang.org/doc/install). 
+Workshare requires `Go` 1.17+ and `C` compiler to build. To install `Go`, follow this [link](https://golang.org/doc/install). 
 
 ### Getting the source
 

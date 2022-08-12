@@ -1,14 +1,14 @@
-# Luckyshare
+# Workshare
 
-Luckyshare区块链，让每个人都可以有ticket制作智能合约或dApp.
+Workshare区块链，让每个人都可以有ticket制作智能合约或dApp.
 
 这是用golang编写的第一个实现，现在是v0.01版，暂时还不能用.
 
-Luckyshare的目标是我为人人，人人为我----也就是*共享*.
+Workshare的目标是我为人人，人人为我----也就是*共享*.
 
-因此，谁要在luckyshare上制作智能合约或dApp，谁就要长时间运行一个luckyshare节点，云节点或者nat节点都可以。
+因此，谁要在Workshare上制作智能合约或dApp，谁就要长时间运行一个Workshare节点，云节点或者nat节点都可以。
 
-Luckyshare区块链与以太坊的生态系统兼容。.
+Workshare区块链与以太坊的生态系统兼容。.
 
 [](https://golang.org)
 
@@ -20,7 +20,7 @@ Luckyshare区块链与以太坊的生态系统兼容。.
     * [Getting the source](#getting-the-source)
     * [Dependency management](#dependency-management)
     * [Building](#building)
-* [Running Luckyshare](#running-luckyshare)
+* [Running Workshare](#running-workshare)
     * [Sub-commands](#sub-commands)
 * [Docker](#docker)
 * [Faucet](#testnet-faucet)
@@ -32,15 +32,15 @@ Luckyshare区块链与以太坊的生态系统兼容。.
 
 ### Requirements
 
-Luckyshare requires `Go` 1.13+ and `C` compiler to build. To install `Go`, follow this [link](https://golang.org/doc/install). 
+Workshare requires `Go` 1.17+ and `C` compiler to build. To install `Go`, follow this [link](https://golang.org/doc/install). 
 
 ### Getting the source
 
-Clone the Luckyshare repo:
+Clone the Workshare repo:
 
 ```
-git clone https://github.com/miniBamboo/luckyshare.git
-cd luckyshare
+git clone https://github.com/miniBamboo/Workshare.git
+cd workshare
 ```
 
 ### Dependency management
@@ -54,7 +54,7 @@ If you keep getting network error, it is suggested to use [Go Module Proxy](http
 
 ### Building
 
-To build the main app `luckyshare`, just run
+To build the main app `workshare`, just run
 
 ```
 make
@@ -68,24 +68,24 @@ make all
 
 If no error reported, all built executable binaries will appear in folder *bin*.
 
-## Running Luckyshare
+## Running Workshare
 
-Connect to Luckyshare's mainnet:
-
-```
-bin/luckyshare --network main
-```
-
-
-Connect to Luckyshare's testnet:
+Connect to Workshare's mainnet:
 
 ```
-bin/luckyshare --network test
+bin/lorkshare --network main
+```
+
+
+Connect to Workshare's testnet:
+
+```
+bin/workshare --network test
 ```
 
 or startup a custom network
 ```
-bin/luckyshare --network <custom-net-genesis.json>
+bin/workshare --network <custom-net-genesis.json>
 ```
 
 
@@ -93,7 +93,7 @@ bin/luckyshare --network <custom-net-genesis.json>
 To find out usages of all command line options:
 
 ```
-bin/luckyshare -h
+bin/workshare -h
 ```
 
 - `--network value`             the network to join (main|test) or path to genesis file
@@ -122,37 +122,37 @@ bin/luckyshare -h
 - `solo`                client runs in solo mode for test & dev
 
 ```
-bin/luckyshare solo --on-demand               # create new block when there is pending transaction
-bin/luckyshare solo --persist                 # save blockchain data to disk(default to memory)
-bin/luckyshare solo --persist --on-demand     # two options can work together
+bin/workshare solo --on-demand               # create new block when there is pending transaction
+bin/workshare solo --persist                 # save blockchain data to disk(default to memory)
+bin/workshare solo --persist --on-demand     # two options can work together
 ```
 
 - `master-key`          master key management
 
 ```
 # print the master address
-bin/luckyshare master-key
+bin/workshare master-key
 
 # export master key to keystore
-bin/luckyshare master-key --export > keystore.json
+bin/workshare master-key --export > keystore.json
 
 
 # import master key from keystore
-cat keystore.json | bin/luckyshare master-key --import
+cat keystore.json | bin/workshare master-key --import
 ```
 
 ## Docker
 
-Docker is one quick way for running a Luckyshare node:
+Docker is one quick way for running a Workshare node:
 
 ```
 docker run -d\
-  -v {path-to-your-data-directory}/.link.luckyshare.chain:/root/.link.luckyshare.chain\
+  -v {path-to-your-data-directory}/.link.workshare.chain:/root/.link.workshare.chain\
   -p 127.0.0.1:51991:51991 -p 11235:11235 -p 11235:11235/udp\
-  --name luckyshare-node miniBamboo/luckyshare --network test
+  --name workshare-node miniBamboo/workshare --network test
 ```
 
-Do not forget to add the `--api-addr 0.0.0.0:51991` flag if you want other containers and/or hosts to have access to the RESTful API. `luckyshare`binds to `localhost` by default and it will not accept requests outside the container itself without the flag.
+Do not forget to add the `--api-addr 0.0.0.0:51991` flag if you want other containers and/or hosts to have access to the RESTful API. `workshare`binds to `localhost` by default and it will not accept requests outside the container itself without the flag.
 
 
 
@@ -160,7 +160,7 @@ Do not forget to add the `--api-addr 0.0.0.0:51991` flag if you want other conta
 
 ## API
 
-Once `luckyshare` started, online *OpenAPI* doc can be accessed in your browser. e.g. http://localhost:51991/ by default.
+Once `workshare` started, online *OpenAPI* doc can be accessed in your browser. e.g. http://localhost:51991/ by default.
 
 
 
@@ -198,6 +198,6 @@ Please check the following:
 
 ## License
 
-Luckyshare is licensed under the
+Workshare is licensed under the
 [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.html), also included
 in *LICENSE* file in repository.

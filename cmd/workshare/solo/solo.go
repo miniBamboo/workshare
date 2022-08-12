@@ -15,7 +15,7 @@ import (
 	"github.com/inconshreveable/log15"
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/cmd/thor/bandwidth"
+	"github.com/miniBamboo/workshare/cmd/workshare/bandwidth"
 	"github.com/miniBamboo/workshare/co"
 	"github.com/miniBamboo/workshare/genesis"
 	"github.com/miniBamboo/workshare/logdb"

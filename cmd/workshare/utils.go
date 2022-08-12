@@ -37,7 +37,7 @@ import (
 	tty "github.com/mattn/go-tty"
 	"github.com/miniBamboo/workshare/api/doc"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/cmd/thor/node"
+	"github.com/miniBamboo/workshare/cmd/workshare/node"
 	"github.com/miniBamboo/workshare/co"
 	"github.com/miniBamboo/workshare/comm"
 	"github.com/miniBamboo/workshare/genesis"

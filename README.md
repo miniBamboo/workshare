@@ -1,4 +1,4 @@
-# Luckyshare
+# Workshare
 
 A blockchain of worker for everybody to make smart contracts or DApp.
 
@@ -20,7 +20,7 @@ It's compatible with Ethereum's ecosystem.
     * [Getting the source](#getting-the-source)
     * [Dependency management](#dependency-management)
     * [Building](#building)
-* [Running Luckyshare](#running-luckyshare)
+* [Running Workshare](#running-workshare)
     * [Sub-commands](#sub-commands)
 * [Docker](#docker)
 * [Faucet](#testnet-faucet)
@@ -36,11 +36,11 @@ Luckyshare requires `Go` 1.13+ and `C` compiler to build. To install `Go`, follo
 
 ### Getting the source
 
-Clone the Luckyshare repo:
+Clone the Workshare repo:
 
 ```
-git clone https://github.com/miniBamboo/luckyshare.git
-cd luckyshare
+git clone https://github.com/miniBamboo/workshare.git
+cd workshare
 ```
 
 ### Dependency management
@@ -54,7 +54,7 @@ If you keep getting network error, it is suggested to use [Go Module Proxy](http
 
 ### Building
 
-To build the main app `luckyshare`, just run
+To build the main app `workshare`, just run
 
 ```
 make
@@ -68,24 +68,24 @@ make all
 
 If no error reported, all built executable binaries will appear in folder *bin*.
 
-## Running Luckyshare
+## Running Workshare
 
-Connect to Luckyshare's mainnet:
-
-```
-bin/luckyshare --network main
-```
-
-
-Connect to Luckyshare's testnet:
+Connect to Workshare's mainnet:
 
 ```
-bin/luckyshare --network test
+bin/workshare --network main
+```
+
+
+Connect to Workshare's testnet:
+
+```
+bin/workshare --network test
 ```
 
 or startup a custom network
 ```
-bin/luckyshare --network <custom-net-genesis.json>
+bin/workshare --network <custom-net-genesis.json>
 ```
 
 
@@ -93,7 +93,7 @@ bin/luckyshare --network <custom-net-genesis.json>
 To find out usages of all command line options:
 
 ```
-bin/luckyshare -h
+bin/workshare -h
 ```
 
 - `--network value`             the network to join (main|test) or path to genesis file
@@ -122,37 +122,37 @@ bin/luckyshare -h
 - `solo`                client runs in solo mode for test & dev
 
 ```
-bin/luckyshare solo --on-demand               # create new block when there is pending transaction
-bin/luckyshare solo --persist                 # save blockchain data to disk(default to memory)
-bin/luckyshare solo --persist --on-demand     # two options can work together
+bin/workshare solo --on-demand               # create new block when there is pending transaction
+bin/workshare solo --persist                 # save blockchain data to disk(default to memory)
+bin/workshare solo --persist --on-demand     # two options can work together
 ```
 
 - `master-key`          master key management
 
 ```
 # print the master address
-bin/luckyshare master-key
+bin/workshare master-key
 
 # export master key to keystore
-bin/luckyshare master-key --export > keystore.json
+bin/workshare master-key --export > keystore.json
 
 
 # import master key from keystore
-cat keystore.json | bin/luckyshare master-key --import
+cat keystore.json | bin/workshare master-key --import
 ```
 
 ## Docker
 
-Docker is one quick way for running a Luckyshare node:
+Docker is one quick way for running a Workshare node:
 
 ```
 docker run -d\
-  -v {path-to-your-data-directory}/.link.luckyshare.chain:/root/.link.luckyshare.chain\
+  -v {path-to-your-data-directory}/.link.workshare.chain:/root/.link.workshare.chain\
   -p 127.0.0.1:51991:51991 -p 11235:11235 -p 11235:11235/udp\
-  --name luckyshare-node miniBamboo/luckyshare --network test
+  --name workshare-node miniBamboo/workshare --network test
 ```
 
-Do not forget to add the `--api-addr 0.0.0.0:51991` flag if you want other containers and/or hosts to have access to the RESTful API. `luckyshare`binds to `localhost` by default and it will not accept requests outside the container itself without the flag.
+Do not forget to add the `--api-addr 0.0.0.0:51991` flag if you want other containers and/or hosts to have access to the RESTful API. `workshare`binds to `localhost` by default and it will not accept requests outside the container itself without the flag.
 
 
 
@@ -180,7 +180,7 @@ Thanks you so much for considering to help out with the source code! We welcome 
 
 Please fork, fix, commit and send a pull request for the maintainers to review and merge into the main code base.
 
-### Forking Luckyshare
+### Forking Workshare
 When you "Fork" the project, GitHub will make a copy of the project that is entirely yours; it lives in your namespace, and you can push to it.
 
 ### Getting ready for a pull request
@@ -198,6 +198,6 @@ Please check the following:
 
 ## License
 
-Luckyshare is licensed under the
+Workshare is licensed under the
 [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.html), also included
 in *LICENSE* file in repository.

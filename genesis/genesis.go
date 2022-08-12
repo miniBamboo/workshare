@@ -9,14 +9,14 @@ import (
 	"github.com/miniBamboo/workshare/abi"
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // Genesis to build genesis block.
 type Genesis struct {
 	builder *Builder
-	id      thor.Bytes32
+	id      workshare.Bytes32
 	name    string
 }
 
@@ -33,7 +33,7 @@ func (g *Genesis) Build(stater *state.Stater) (blk *block.Block, events tx.Event
 }
 
 // ID returns genesis block ID.
-func (g *Genesis) ID() thor.Bytes32 {
+func (g *Genesis) ID() workshare.Bytes32 {
 	return g.id
 }
 

@@ -11,12 +11,12 @@ import (
 	"github.com/hashicorp/golang-lru/simplelru"
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/poa"
+	"github.com/miniBamboo/workshare/consensus/poa"
 
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/miniBamboo/workshare/xenv"
 )
 
@@ -26,20 +26,20 @@ type Consensus struct {
 	repo                 *chain.Repository
 	stater               *state.Stater
 	seeder               *poa.Seeder
-	forkConfig           thor.ForkConfig
+	forkConfig           workshare.ForkConfig
 	correctReceiptsRoots map[string]string
 	candidatesCache      *simplelru.LRU
 }
 
 // New create a Consensus instance.
-func New(repo *chain.Repository, stater *state.Stater, forkConfig thor.ForkConfig) *Consensus {
+func New(repo *chain.Repository, stater *state.Stater, forkConfig workshare.ForkConfig) *Consensus {
 	candidatesCache, _ := simplelru.NewLRU(16, nil)
 	return &Consensus{
 		repo:                 repo,
 		stater:               stater,
 		seeder:               poa.NewSeeder(repo),
 		forkConfig:           forkConfig,
-		correctReceiptsRoots: thor.LoadCorrectReceiptsRoots(),
+		correctReceiptsRoots: workshare.LoadCorrectReceiptsRoots(),
 		candidatesCache:      candidatesCache,
 	}
 }

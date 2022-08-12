@@ -15,13 +15,13 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/miniBamboo/workshare/block"
 	. "github.com/miniBamboo/workshare/block"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBlock(t *testing.T) {
-	tx1 := new(tx.Builder).Clause(tx.NewClause(&thor.Address{})).Clause(tx.NewClause(&thor.Address{})).Build()
+	tx1 := new(tx.Builder).Clause(tx.NewClause(&workshare.Address{})).Clause(tx.NewClause(&workshare.Address{})).Build()
 	tx2 := new(tx.Builder).Clause(tx.NewClause(nil)).Build()
 
 	privKey := string("dce1443bd2ef0c2631adc1c67e5c93f13dc23a41c18b536effbbdcbcdb96fb65")
@@ -29,11 +29,11 @@ func TestBlock(t *testing.T) {
 	now := uint64(time.Now().UnixNano())
 
 	var (
-		gasUsed     uint64       = 1000
-		gasLimit    uint64       = 14000
-		totalScore  uint64       = 101
-		emptyRoot   thor.Bytes32 = thor.BytesToBytes32([]byte("0"))
-		beneficiary thor.Address = thor.BytesToAddress([]byte("abc"))
+		gasUsed     uint64            = 1000
+		gasLimit    uint64            = 14000
+		totalScore  uint64            = 101
+		emptyRoot   workshare.Bytes32 = workshare.BytesToBytes32([]byte("0"))
+		beneficiary workshare.Address = workshare.BytesToAddress([]byte("abc"))
 	)
 
 	block := new(Builder).

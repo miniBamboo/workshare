@@ -13,23 +13,23 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/miniBamboo/workshare/muxdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCachedObject(t *testing.T) {
 	db := muxdb.NewMem()
-	addr := thor.Address{}
+	addr := workshare.Address{}
 
-	stgTrie := db.NewTrie(StorageTrieName([]byte("sid")), thor.Bytes32{}, 0, 0)
+	stgTrie := db.NewTrie(StorageTrieName([]byte("sid")), workshare.Bytes32{}, 0, 0)
 	storages := []struct {
-		k thor.Bytes32
+		k workshare.Bytes32
 		v rlp.RawValue
 	}{
-		{thor.BytesToBytes32([]byte("key1")), []byte("value1")},
-		{thor.BytesToBytes32([]byte("key2")), []byte("value2")},
-		{thor.BytesToBytes32([]byte("key3")), []byte("value3")},
-		{thor.BytesToBytes32([]byte("key4")), []byte("value4")},
+		{workshare.BytesToBytes32([]byte("key1")), []byte("value1")},
+		{workshare.BytesToBytes32([]byte("key2")), []byte("value2")},
+		{workshare.BytesToBytes32([]byte("key3")), []byte("value3")},
+		{workshare.BytesToBytes32([]byte("key4")), []byte("value4")},
 	}
 
 	for _, s := range storages {

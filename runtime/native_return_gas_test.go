@@ -4,18 +4,18 @@ import (
 	"math"
 	"testing"
 
-	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/miniBamboo/workshare/xenv"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNativeCallReturnGas(t *testing.T) {
 	db := muxdb.NewMem()
-	state := state.New(db, thor.Bytes32{}, 0, 0, 0)
+	state := state.New(db, workshare.Bytes32{}, 0, 0, 0)
 	state.SetCode(builtin.Measure.Address, builtin.Measure.RuntimeBytecodes())
 
 	inner, _ := builtin.Measure.ABI.MethodByName("inner")
@@ -23,7 +23,7 @@ func TestNativeCallReturnGas(t *testing.T) {
 	outer, _ := builtin.Measure.ABI.MethodByName("outer")
 	outerData, _ := outer.EncodeInput()
 
-	exec, _ := New(nil, state, &xenv.BlockContext{}, thor.NoFork).PrepareClause(
+	exec, _ := New(nil, state, &xenv.BlockContext{}, workshare.NoFork).PrepareClause(
 		tx.NewClause(&builtin.Measure.Address).WithData(innerData),
 		0,
 		math.MaxUint64,
@@ -33,7 +33,7 @@ func TestNativeCallReturnGas(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Nil(t, innerOutput.VMErr)
 
-	exec, _ = New(nil, state, &xenv.BlockContext{}, thor.NoFork).PrepareClause(
+	exec, _ = New(nil, state, &xenv.BlockContext{}, workshare.NoFork).PrepareClause(
 		tx.NewClause(&builtin.Measure.Address).WithData(outerData),
 		0,
 		math.MaxUint64,

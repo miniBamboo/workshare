@@ -11,7 +11,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/miniBamboo/workshare/muxdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -40,9 +40,9 @@ func TestAccount(t *testing.T) {
 
 func TestTrie(t *testing.T) {
 	db := muxdb.NewMem()
-	trie := db.NewTrie("", thor.Bytes32{}, 0, 0)
+	trie := db.NewTrie("", workshare.Bytes32{}, 0, 0)
 
-	addr := thor.BytesToAddress([]byte("account1"))
+	addr := workshare.BytesToAddress([]byte("account1"))
 	assert.Equal(t,
 		M(loadAccount(trie, addr, 0)),
 		M(emptyAccount(), &AccountMetadata{}, nil),
@@ -75,9 +75,9 @@ func TestTrie(t *testing.T) {
 
 func TestStorageTrie(t *testing.T) {
 	db := muxdb.NewMem()
-	trie := db.NewTrie("", thor.Bytes32{}, 0, 0)
+	trie := db.NewTrie("", workshare.Bytes32{}, 0, 0)
 
-	key := thor.BytesToBytes32([]byte("key"))
+	key := workshare.BytesToBytes32([]byte("key"))
 	assert.Equal(t,
 		M(loadStorage(trie, key, 0)),
 		M(rlp.RawValue(nil), nil))

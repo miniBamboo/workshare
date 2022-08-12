@@ -16,7 +16,7 @@ import (
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/inconshreveable/log15"
 	"github.com/miniBamboo/workshare/p2psrv/rpc"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 const (
@@ -39,7 +39,7 @@ type Peer struct {
 	knownBlocks *lru.Cache
 	head        struct {
 		sync.Mutex
-		id         thor.Bytes32
+		id         workshare.Bytes32
 		totalScore uint64
 	}
 }
@@ -66,14 +66,14 @@ func newPeer(peer *p2p.Peer, rw p2p.MsgReadWriter) *Peer {
 }
 
 // Head returns head block ID and total score.
-func (p *Peer) Head() (id thor.Bytes32, totalScore uint64) {
+func (p *Peer) Head() (id workshare.Bytes32, totalScore uint64) {
 	p.head.Lock()
 	defer p.head.Unlock()
 	return p.head.id, p.head.totalScore
 }
 
 // UpdateHead update ID and total score of head block.
-func (p *Peer) UpdateHead(id thor.Bytes32, totalScore uint64) {
+func (p *Peer) UpdateHead(id workshare.Bytes32, totalScore uint64) {
 	p.head.Lock()
 	defer p.head.Unlock()
 	if totalScore > p.head.totalScore {
@@ -82,21 +82,21 @@ func (p *Peer) UpdateHead(id thor.Bytes32, totalScore uint64) {
 }
 
 // MarkTransaction marks a transaction to known.
-func (p *Peer) MarkTransaction(hash thor.Bytes32) {
+func (p *Peer) MarkTransaction(hash workshare.Bytes32) {
 	// that's 10~100 block intervals
-	expiration := mclock.AbsTime(time.Second * time.Duration(thor.BlockInterval*uint64(rand.Intn(91)+10)))
+	expiration := mclock.AbsTime(time.Second * time.Duration(workshare.BlockInterval*uint64(rand.Intn(91)+10)))
 
 	deadline := mclock.Now() + expiration
 	p.knownTxs.Add(hash, deadline)
 }
 
 // MarkBlock marks a block to known.
-func (p *Peer) MarkBlock(id thor.Bytes32) {
+func (p *Peer) MarkBlock(id workshare.Bytes32) {
 	p.knownBlocks.Add(id, struct{}{})
 }
 
 // IsTransactionKnown returns if the transaction is known.
-func (p *Peer) IsTransactionKnown(hash thor.Bytes32) bool {
+func (p *Peer) IsTransactionKnown(hash workshare.Bytes32) bool {
 	deadline, ok := p.knownTxs.Get(hash)
 	if !ok {
 		return false
@@ -105,7 +105,7 @@ func (p *Peer) IsTransactionKnown(hash thor.Bytes32) bool {
 }
 
 // IsBlockKnown returns if the block is known.
-func (p *Peer) IsBlockKnown(id thor.Bytes32) bool {
+func (p *Peer) IsBlockKnown(id workshare.Bytes32) bool {
 	return p.knownBlocks.Contains(id)
 }
 

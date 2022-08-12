@@ -13,9 +13,9 @@ import (
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/kv"
 	"github.com/miniBamboo/workshare/muxdb"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/trie"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
@@ -34,7 +34,7 @@ type storageTxMeta struct {
 // TxMeta contains tx location and reversal state.
 type TxMeta struct {
 	// The block id this tx is involved.
-	BlockID thor.Bytes32
+	BlockID workshare.Bytes32
 
 	// Index the position of the tx in block's txs.
 	Index uint64 // rlp require uint64.
@@ -47,11 +47,11 @@ type TxMeta struct {
 // It provides reliable methods to access block by number, tx by id, etc...
 type Chain struct {
 	repo     *Repository
-	headID   thor.Bytes32
+	headID   workshare.Bytes32
 	lazyInit func() (*muxdb.Trie, error)
 }
 
-func newChain(repo *Repository, headID thor.Bytes32) *Chain {
+func newChain(repo *Repository, headID workshare.Bytes32) *Chain {
 	var (
 		indexTrie *muxdb.Trie
 		initErr   error
@@ -74,20 +74,20 @@ func newChain(repo *Repository, headID thor.Bytes32) *Chain {
 }
 
 // GenesisID returns genesis id.
-func (c *Chain) GenesisID() thor.Bytes32 {
+func (c *Chain) GenesisID() workshare.Bytes32 {
 	return c.repo.GenesisBlock().Header().ID()
 }
 
 // HeadID returns the head block id.
-func (c *Chain) HeadID() thor.Bytes32 {
+func (c *Chain) HeadID() workshare.Bytes32 {
 	return c.headID
 }
 
 // GetBlockID returns block id by given block number.
-func (c *Chain) GetBlockID(num uint32) (thor.Bytes32, error) {
+func (c *Chain) GetBlockID(num uint32) (workshare.Bytes32, error) {
 	trie, err := c.lazyInit()
 	if err != nil {
-		return thor.Bytes32{}, err
+		return workshare.Bytes32{}, err
 	}
 
 	var key [4]byte
@@ -95,16 +95,16 @@ func (c *Chain) GetBlockID(num uint32) (thor.Bytes32, error) {
 
 	data, _, err := trie.Get(key[:])
 	if err != nil {
-		return thor.Bytes32{}, err
+		return workshare.Bytes32{}, err
 	}
 	if len(data) == 0 {
-		return thor.Bytes32{}, errNotFound
+		return workshare.Bytes32{}, errNotFound
 	}
-	return thor.BytesToBytes32(data), nil
+	return workshare.BytesToBytes32(data), nil
 }
 
 // GetTransactionMeta returns tx meta by given tx id.
-func (c *Chain) GetTransactionMeta(id thor.Bytes32) (*TxMeta, error) {
+func (c *Chain) GetTransactionMeta(id workshare.Bytes32) (*TxMeta, error) {
 	// precheck. point access is faster than range access.
 	if has, err := c.repo.txIndexer.Has(id[:]); err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func (c *Chain) GetTransactionMeta(id thor.Bytes32) (*TxMeta, error) {
 			continue
 		}
 
-		blockID := thor.BytesToBytes32(iter.Key()[32:])
+		blockID := workshare.BytesToBytes32(iter.Key()[32:])
 
 		has, err := c.HasBlock(blockID)
 		if err != nil {
@@ -171,7 +171,7 @@ func (c *Chain) GetBlock(num uint32) (*block.Block, error) {
 }
 
 // GetTransaction returns tx along with meta by given tx id.
-func (c *Chain) GetTransaction(id thor.Bytes32) (*tx.Transaction, *TxMeta, error) {
+func (c *Chain) GetTransaction(id workshare.Bytes32) (*tx.Transaction, *TxMeta, error) {
 	txMeta, err := c.GetTransactionMeta(id)
 	if err != nil {
 		return nil, nil, err
@@ -187,7 +187,7 @@ func (c *Chain) GetTransaction(id thor.Bytes32) (*tx.Transaction, *TxMeta, error
 }
 
 // GetTransactionReceipt returns tx receipt by given tx id.
-func (c *Chain) GetTransactionReceipt(txID thor.Bytes32) (*tx.Receipt, error) {
+func (c *Chain) GetTransactionReceipt(txID workshare.Bytes32) (*tx.Receipt, error) {
 	txMeta, err := c.GetTransactionMeta(txID)
 	if err != nil {
 		return nil, err
@@ -203,7 +203,7 @@ func (c *Chain) GetTransactionReceipt(txID thor.Bytes32) (*tx.Receipt, error) {
 }
 
 // HasBlock check if the block with given id belongs to the chain.
-func (c *Chain) HasBlock(id thor.Bytes32) (bool, error) {
+func (c *Chain) HasBlock(id workshare.Bytes32) (bool, error) {
 	foundID, err := c.GetBlockID(block.Number(id))
 	if err != nil {
 		if c.repo.IsNotFound(err) {
@@ -217,10 +217,10 @@ func (c *Chain) HasBlock(id thor.Bytes32) (bool, error) {
 // Exclude returns ids of blocks belongs to this chain, but not belongs to other.
 //
 // The returned ids are in ascending order.
-func (c *Chain) Exclude(other *Chain) ([]thor.Bytes32, error) {
+func (c *Chain) Exclude(other *Chain) ([]workshare.Bytes32, error) {
 	oHeadID := other.headID
 	oHeadNum := block.Number(oHeadID)
-	var ids []thor.Bytes32
+	var ids []workshare.Bytes32
 
 	id := c.headID
 	for {
@@ -311,14 +311,14 @@ func (r *Repository) NewBestChain() *Chain {
 }
 
 // NewChain create a chain with head block specified by headID.
-func (r *Repository) NewChain(headID thor.Bytes32) *Chain {
+func (r *Repository) NewChain(headID workshare.Bytes32) *Chain {
 	return newChain(r, headID)
 }
 
-func (r *Repository) indexBlock(parentConflicts uint32, newBlockID thor.Bytes32, newConflicts uint32) error {
+func (r *Repository) indexBlock(parentConflicts uint32, newBlockID workshare.Bytes32, newConflicts uint32) error {
 	var (
 		newNum = block.Number(newBlockID)
-		root   thor.Bytes32
+		root   workshare.Bytes32
 	)
 
 	if newNum != 0 { // not a genesis block

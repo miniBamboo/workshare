@@ -3,7 +3,7 @@ package debug
 import (
 	"encoding/json"
 
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type TracerOption struct {
@@ -14,20 +14,20 @@ type TracerOption struct {
 }
 
 type StorageRangeOption struct {
-	Address   thor.Address
+	Address   workshare.Address
 	KeyStart  string
 	MaxResult int
 	Target    string
 }
 
 type StorageRangeResult struct {
-	Storage StorageMap    `json:"storage"`
-	NextKey *thor.Bytes32 `json:"nextKey"` // nil if Storage includes the last key in the trie.
+	Storage StorageMap         `json:"storage"`
+	NextKey *workshare.Bytes32 `json:"nextKey"` // nil if Storage includes the last key in the trie.
 }
 
 type StorageMap map[string]StorageEntry
 
 type StorageEntry struct {
-	Key   *thor.Bytes32 `json:"key"`
-	Value *thor.Bytes32 `json:"value"`
+	Key   *workshare.Bytes32 `json:"key"`
+	Value *workshare.Bytes32 `json:"value"`
 }

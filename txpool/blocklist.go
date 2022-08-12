@@ -16,12 +16,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // blocklist is a address list contains addresses that are blocked.
 type blocklist struct {
-	list map[thor.Address]bool
+	list map[workshare.Address]bool
 	lock sync.Mutex
 }
 
@@ -53,7 +53,7 @@ func (bl *blocklist) Save(path string) error {
 	}
 	defer file.Close()
 
-	var listToSave []thor.Address
+	var listToSave []workshare.Address
 
 	bl.lock.Lock()
 	for addr := range bl.list {
@@ -109,7 +109,7 @@ func (bl *blocklist) Fetch(ctx context.Context, url string, eTag *string) error 
 }
 
 // Contains returns whether the given address is listed.
-func (bl *blocklist) Contains(addr thor.Address) bool {
+func (bl *blocklist) Contains(addr workshare.Address) bool {
 	bl.lock.Lock()
 	defer bl.lock.Unlock()
 
@@ -123,16 +123,16 @@ func (bl *blocklist) Len() int {
 	return len(bl.list)
 }
 
-func (bl *blocklist) readList(r io.Reader) (map[thor.Address]bool, error) {
+func (bl *blocklist) readList(r io.Reader) (map[workshare.Address]bool, error) {
 	scanner := bufio.NewScanner(r)
-	list := make(map[thor.Address]bool)
+	list := make(map[workshare.Address]bool)
 
 	for scanner.Scan() {
 		addrStr := strings.TrimSpace(scanner.Text())
 		if addrStr == "" {
 			continue
 		}
-		addr, err := thor.ParseAddress(addrStr)
+		addr, err := workshare.ParseAddress(addrStr)
 		if err != nil {
 			return nil, err
 		}

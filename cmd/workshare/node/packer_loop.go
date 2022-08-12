@@ -13,8 +13,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/miniBamboo/workshare/packer"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -34,8 +34,8 @@ func (n *Node) packerLoop(ctx context.Context) {
 	log.Info("synchronization process done")
 
 	var (
-		authorized bool
-		ticker     = n.repo.NewTicker()
+		auworkshareized bool
+		ticker          = n.repo.NewTicker()
 	)
 
 	n.packer.SetTargetGasLimit(n.targetGasLimit)
@@ -55,8 +55,8 @@ func (n *Node) packerLoop(ctx context.Context) {
 
 		flow, err := n.packer.Schedule(n.repo.BestBlockSummary(), now)
 		if err != nil {
-			if authorized {
-				authorized = false
+			if auworkshareized {
+				auworkshareized = false
 				log.Warn("unable to pack block", "err", err)
 			}
 			select {
@@ -67,14 +67,14 @@ func (n *Node) packerLoop(ctx context.Context) {
 			}
 		}
 
-		if !authorized {
-			authorized = true
+		if !auworkshareized {
+			auworkshareized = true
 			log.Info("prepared to pack block")
 		}
 		log.Debug("scheduled to pack block", "after", time.Duration(flow.When()-now)*time.Second)
 
 		for {
-			if uint64(time.Now().Unix())+thor.BlockInterval/2 > flow.When() {
+			if uint64(time.Now().Unix())+workshare.BlockInterval/2 > flow.When() {
 				// time to pack block
 				// blockInterval/2 early to allow more time for processing txs
 				if err := n.pack(flow); err != nil {

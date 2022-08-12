@@ -1,4 +1,4 @@
-// Copyright 2016 The go-ethereum Authors
+// Copyright 2016 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/miniBamboo/workshare/lowrlp"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type hasher struct {
@@ -218,7 +218,7 @@ func (h *hasher) store(n node, db DatabaseWriter, path []byte, force bool) (node
 		if h.nonCrypto {
 			hash.Hash = NonCryptoNodeHash
 		} else {
-			hash.Hash = thor.Blake2b(h.tmp)
+			hash.Hash = workshare.Blake2b(h.tmp)
 		}
 	} else {
 		cpy := *hash

@@ -8,13 +8,13 @@ package tx
 import (
 	"math/big"
 
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // Transfer token transfer log.
 type Transfer struct {
-	Sender    thor.Address
-	Recipient thor.Address
+	Sender    workshare.Address
+	Recipient workshare.Address
 	Amount    *big.Int
 }
 

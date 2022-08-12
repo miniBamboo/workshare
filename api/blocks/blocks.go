@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/miniBamboo/workshare/api/utils"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -77,7 +77,7 @@ func (b *Blocks) parseRevision(revision string) (interface{}, error) {
 		return nil, nil
 	}
 	if len(revision) == 66 || len(revision) == 64 {
-		blockID, err := thor.ParseBytes32(revision)
+		blockID, err := workshare.ParseBytes32(revision)
 		if err != nil {
 			return nil, err
 		}
@@ -94,9 +94,9 @@ func (b *Blocks) parseRevision(revision string) (interface{}, error) {
 }
 
 func (b *Blocks) getBlockSummary(revision interface{}) (s *chain.BlockSummary, err error) {
-	var id thor.Bytes32
+	var id workshare.Bytes32
 	switch revision := revision.(type) {
-	case thor.Bytes32:
+	case workshare.Bytes32:
 		id = revision
 	case uint32:
 		id, err = b.repo.NewBestChain().GetBlockID(revision)
@@ -109,7 +109,7 @@ func (b *Blocks) getBlockSummary(revision interface{}) (s *chain.BlockSummary, e
 	return b.repo.GetBlockSummary(id)
 }
 
-func (b *Blocks) isTrunk(blkID thor.Bytes32, blkNum uint32) (bool, error) {
+func (b *Blocks) isTrunk(blkID workshare.Bytes32, blkNum uint32) (bool, error) {
 	idByNum, err := b.repo.NewBestChain().GetBlockID(blkNum)
 	if err != nil {
 		return false, err

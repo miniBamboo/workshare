@@ -8,25 +8,25 @@ package genesis
 import (
 	"math/big"
 
-	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // NewMainnet create mainnet genesis.
 func NewMainnet() *Genesis {
 	launchTime := uint64(1530316800) // '2018-06-30T00:00:00.000Z'
 
-	initialAuthorityNodes := loadAuthorityNodes()
+	initialAuworkshareityNodes := loadAuworkshareityNodes()
 
 	builder := new(Builder).
 		Timestamp(launchTime).
-		GasLimit(thor.InitialGasLimit).
-		ForkConfig(thor.NoFork).
+		GasLimit(workshare.InitialGasLimit).
+		ForkConfig(workshare.NoFork).
 		State(func(state *state.State) error {
 			// alloc builtin contracts
-			if err := state.SetCode(builtin.Authority.Address, builtin.Authority.RuntimeBytecodes()); err != nil {
+			if err := state.SetCode(builtin.Auworkshareity.Address, builtin.Auworkshareity.RuntimeBytecodes()); err != nil {
 				return err
 			}
 			if err := state.SetCode(builtin.Energy.Address, builtin.Energy.RuntimeBytecodes()); err != nil {
@@ -48,10 +48,10 @@ func NewMainnet() *Genesis {
 			tokenSupply := &big.Int{}
 			energySupply := &big.Int{}
 
-			// alloc tokens for authority node endorsor
-			for _, anode := range initialAuthorityNodes {
-				tokenSupply.Add(tokenSupply, thor.InitialProposerEndorsement)
-				if err := state.SetBalance(anode.endorsorAddress, thor.InitialProposerEndorsement); err != nil {
+			// alloc tokens for auworkshareity node endorsor
+			for _, anode := range initialAuworkshareityNodes {
+				tokenSupply.Add(tokenSupply, workshare.InitialProposerEndorsement)
+				if err := state.SetBalance(anode.endorsorAddress, workshare.InitialProposerEndorsement); err != nil {
 					return err
 				}
 				if err := state.SetEnergy(anode.endorsorAddress, &big.Int{}, launchTime); err != nil {
@@ -63,34 +63,34 @@ func NewMainnet() *Genesis {
 			// 21,046,908,616.5 x 4
 			amount := new(big.Int).Mul(big.NewInt(210469086165), big.NewInt(1e17))
 			tokenSupply.Add(tokenSupply, amount)
-			if err := state.SetBalance(thor.MustParseAddress("0x137053dfbe6c0a43f915ad2efefefdcc2708e975"), amount); err != nil {
+			if err := state.SetBalance(workshare.MustParseAddress("0x137053dfbe6c0a43f915ad2efefefdcc2708e975"), amount); err != nil {
 				return err
 			}
-			if err := state.SetEnergy(thor.MustParseAddress("0x137053dfbe6c0a43f915ad2efefefdcc2708e975"), &big.Int{}, launchTime); err != nil {
-				return err
-			}
-
-			tokenSupply.Add(tokenSupply, amount)
-			if err := state.SetBalance(thor.MustParseAddress("0xaf111431c1284a5e16d2eecd2daed133ce96820e"), amount); err != nil {
-				return err
-			}
-			if err := state.SetEnergy(thor.MustParseAddress("0xaf111431c1284a5e16d2eecd2daed133ce96820e"), &big.Int{}, launchTime); err != nil {
+			if err := state.SetEnergy(workshare.MustParseAddress("0x137053dfbe6c0a43f915ad2efefefdcc2708e975"), &big.Int{}, launchTime); err != nil {
 				return err
 			}
 
 			tokenSupply.Add(tokenSupply, amount)
-			if err := state.SetBalance(thor.MustParseAddress("0x997522a4274336f4b86af4a6ed9e45aedcc6d360"), amount); err != nil {
+			if err := state.SetBalance(workshare.MustParseAddress("0xaf111431c1284a5e16d2eecd2daed133ce96820e"), amount); err != nil {
 				return err
 			}
-			if err := state.SetEnergy(thor.MustParseAddress("0x997522a4274336f4b86af4a6ed9e45aedcc6d360"), &big.Int{}, launchTime); err != nil {
+			if err := state.SetEnergy(workshare.MustParseAddress("0xaf111431c1284a5e16d2eecd2daed133ce96820e"), &big.Int{}, launchTime); err != nil {
 				return err
 			}
 
 			tokenSupply.Add(tokenSupply, amount)
-			if err := state.SetBalance(thor.MustParseAddress("0x0bd7b06debd1522e75e4b91ff598f107fd826c8a"), amount); err != nil {
+			if err := state.SetBalance(workshare.MustParseAddress("0x997522a4274336f4b86af4a6ed9e45aedcc6d360"), amount); err != nil {
 				return err
 			}
-			if err := state.SetEnergy(thor.MustParseAddress("0x0bd7b06debd1522e75e4b91ff598f107fd826c8a"), &big.Int{}, launchTime); err != nil {
+			if err := state.SetEnergy(workshare.MustParseAddress("0x997522a4274336f4b86af4a6ed9e45aedcc6d360"), &big.Int{}, launchTime); err != nil {
+				return err
+			}
+
+			tokenSupply.Add(tokenSupply, amount)
+			if err := state.SetBalance(workshare.MustParseAddress("0x0bd7b06debd1522e75e4b91ff598f107fd826c8a"), amount); err != nil {
+				return err
+			}
+			if err := state.SetEnergy(workshare.MustParseAddress("0x0bd7b06debd1522e75e4b91ff598f107fd826c8a"), &big.Int{}, launchTime); err != nil {
 				return err
 			}
 
@@ -100,27 +100,27 @@ func NewMainnet() *Genesis {
 	///// initialize builtin contracts
 
 	// initialize params
-	data := mustEncodeInput(builtin.Params.ABI, "set", thor.KeyExecutorAddress, new(big.Int).SetBytes(builtin.Executor.Address[:]))
-	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), thor.Address{})
+	data := mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyExecutorAddress, new(big.Int).SetBytes(builtin.Executor.Address[:]))
+	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), workshare.Address{})
 
-	data = mustEncodeInput(builtin.Params.ABI, "set", thor.KeyRewardRatio, thor.InitialRewardRatio)
+	data = mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyRewardRatio, workshare.InitialRewardRatio)
 	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), builtin.Executor.Address)
 
-	data = mustEncodeInput(builtin.Params.ABI, "set", thor.KeyBaseGasPrice, thor.InitialBaseGasPrice)
+	data = mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyBaseGasPrice, workshare.InitialBaseGasPrice)
 	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), builtin.Executor.Address)
 
-	data = mustEncodeInput(builtin.Params.ABI, "set", thor.KeyProposerEndorsement, thor.InitialProposerEndorsement)
+	data = mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyProposerEndorsement, workshare.InitialProposerEndorsement)
 	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), builtin.Executor.Address)
 
-	// add initial authority nodes
-	for _, anode := range initialAuthorityNodes {
-		data := mustEncodeInput(builtin.Authority.ABI, "add", anode.masterAddress, anode.endorsorAddress, anode.identity)
-		builder.Call(tx.NewClause(&builtin.Authority.Address).WithData(data), builtin.Executor.Address)
+	// add initial auworkshareity nodes
+	for _, anode := range initialAuworkshareityNodes {
+		data := mustEncodeInput(builtin.Auworkshareity.ABI, "add", anode.masterAddress, anode.endorsorAddress, anode.identity)
+		builder.Call(tx.NewClause(&builtin.Auworkshareity.Address).WithData(data), builtin.Executor.Address)
 	}
 
 	// add initial approvers (steering committee)
 	for _, approver := range loadApprovers() {
-		data := mustEncodeInput(builtin.Executor.ABI, "addApprover", approver.address, thor.BytesToBytes32([]byte(approver.identity)))
+		data := mustEncodeInput(builtin.Executor.ABI, "addApprover", approver.address, workshare.BytesToBytes32([]byte(approver.identity)))
 		builder.Call(tx.NewClause(&builtin.Executor.Address).WithData(data), builtin.Executor.Address)
 	}
 
@@ -134,30 +134,30 @@ func NewMainnet() *Genesis {
 	return &Genesis{builder, id, "mainnet"}
 }
 
-type authorityNode struct {
-	masterAddress   thor.Address
-	endorsorAddress thor.Address
-	identity        thor.Bytes32
+type auworkshareityNode struct {
+	masterAddress   workshare.Address
+	endorsorAddress workshare.Address
+	identity        workshare.Bytes32
 }
 
 type approver struct {
-	address  thor.Address
+	address  workshare.Address
 	identity string
 }
 
 func loadApprovers() []*approver {
 	return []*approver{
-		{thor.MustParseAddress("0xb0f6d9933c1c2f4d891ca479343921f2d32e0fad"), "CY Cheung"},
-		{thor.MustParseAddress("0xda48cc4d23b41158e1294e0e4bcce8e9953cee26"), "George Kang"},
-		{thor.MustParseAddress("0xca7b45abe0d421e5628d2224bfe8fa6a6cf7c51b"), "Jay Zhang"},
-		{thor.MustParseAddress("0xa03f185f2a0def1efdd687ef3b96e404869d93de"), "Margaret Rui Zhu"},
-		{thor.MustParseAddress("0x74bac19f78369637db63f7496ecb5f88cc183672"), "Peter Zhou"},
-		{thor.MustParseAddress("0x5fefc7836af047c949d1fea72839823d2f06f7e3"), "Renato Grottola"},
-		{thor.MustParseAddress("0x7519874d0f7d31b5f0fd6f0429a4e5ece6f3fd49"), "Sunny Lu"},
+		{workshare.MustParseAddress("0xb0f6d9933c1c2f4d891ca479343921f2d32e0fad"), "CY Cheung"},
+		{workshare.MustParseAddress("0xda48cc4d23b41158e1294e0e4bcce8e9953cee26"), "George Kang"},
+		{workshare.MustParseAddress("0xca7b45abe0d421e5628d2224bfe8fa6a6cf7c51b"), "Jay Zhang"},
+		{workshare.MustParseAddress("0xa03f185f2a0def1efdd687ef3b96e404869d93de"), "Margaret Rui Zhu"},
+		{workshare.MustParseAddress("0x74bac19f78369637db63f7496ecb5f88cc183672"), "Peter Zhou"},
+		{workshare.MustParseAddress("0x5fefc7836af047c949d1fea72839823d2f06f7e3"), "Renato Grottola"},
+		{workshare.MustParseAddress("0x7519874d0f7d31b5f0fd6f0429a4e5ece6f3fd49"), "Sunny Lu"},
 	}
 }
 
-func loadAuthorityNodes() []*authorityNode {
+func loadAuworkshareityNodes() []*auworkshareityNode {
 	all := [...][3]string{
 		{"0xdbe84597403b9aec770aef4a93a3065b3b58d306", "0xb3a4831cadcee1efb78028c2ba72f29f22a197e1", "0xb11c5752af4c9ab07e7379e693e47ffba97e1f4f686128cea601b2ea64646732"},
 		{"0x0625e7b8a7c2e696cb31fd130162189314520171", "0x9366662519dc456bd5b8bc4ee4b6852338d82f08", "0x0ff7f5023e49ab9f558d7d9a743fb3a864ebde1f2497b896b527f970a292d7da"},
@@ -262,12 +262,12 @@ func loadAuthorityNodes() []*authorityNode {
 		{"0xbac07f33d09d5856182f430483c3df94077d0789", "0x28518e904c0bbed782b39fb7dd3dc24b99a65295", "0xf5bf71170433c4364f094c5484b41c47d4dd06880287921002544d9ab94256ba"},
 	}
 
-	candidates := make([]*authorityNode, 0, len(all))
+	candidates := make([]*auworkshareityNode, 0, len(all))
 	for _, item := range all {
-		candidates = append(candidates, &authorityNode{
-			masterAddress:   thor.MustParseAddress(item[0]),
-			endorsorAddress: thor.MustParseAddress(item[1]),
-			identity:        thor.MustParseBytes32(item[2]),
+		candidates = append(candidates, &auworkshareityNode{
+			masterAddress:   workshare.MustParseAddress(item[0]),
+			endorsorAddress: workshare.MustParseAddress(item[1]),
+			identity:        workshare.MustParseBytes32(item[2]),
 		})
 	}
 	return candidates

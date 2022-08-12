@@ -7,7 +7,7 @@ package state
 
 import (
 	"github.com/miniBamboo/workshare/muxdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // Stater is the state creator.
@@ -21,6 +21,6 @@ func NewStater(db *muxdb.MuxDB) *Stater {
 }
 
 // NewState create a new state object.
-func (s *Stater) NewState(root thor.Bytes32, blockNum, blockConflicts, steadyBlockNum uint32) *State {
+func (s *Stater) NewState(root workshare.Bytes32, blockNum, blockConflicts, steadyBlockNum uint32) *State {
 	return New(s.db, root, blockNum, blockConflicts, steadyBlockNum)
 }

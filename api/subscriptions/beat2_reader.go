@@ -10,8 +10,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
-	"github.com/miniBamboo/workshare/thor/bloom"
+	"github.com/miniBamboo/workshare/workshare"
+	"github.com/miniBamboo/workshare/workshare/bloom"
 )
 
 type beat2Reader struct {
@@ -19,7 +19,7 @@ type beat2Reader struct {
 	blockReader chain.BlockReader
 }
 
-func newBeat2Reader(repo *chain.Repository, position thor.Bytes32) *beat2Reader {
+func newBeat2Reader(repo *chain.Repository, position workshare.Bytes32) *beat2Reader {
 	return &beat2Reader{
 		repo:        repo,
 		blockReader: repo.NewBlockReader(position),
@@ -38,7 +38,7 @@ func (br *beat2Reader) Read() ([]interface{}, bool, error) {
 	bloomAdd := func(key []byte) {
 		key = bytes.TrimLeft(key, "\x00")
 		// exclude non-address key
-		if len(key) <= thor.AddressLength {
+		if len(key) <= workshare.AddressLength {
 			bloomGenerator.Add(key)
 		}
 	}

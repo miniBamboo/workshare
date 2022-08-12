@@ -1,4 +1,4 @@
-// Copyright 2017 The go-ethereum Authors
+// Copyright 2017 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -21,16 +21,16 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/vm"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // Context contains some contextual infos for a transaction execution that is not
 // available from within the EVM object.
 type Context struct {
-	BlockID thor.Bytes32 // Hash of the block the tx is contained within (zero if dangling tx or call)
-	TxIndex int          // Index of the transaction within a block (zero if dangling tx or call)
-	TxID    thor.Bytes32 // Hash of the transaction being traced (zero if dangling call)
+	BlockID workshare.Bytes32 // Hash of the block the tx is contained within (zero if dangling tx or call)
+	TxIndex int               // Index of the transaction within a block (zero if dangling tx or call)
+	TxID    workshare.Bytes32 // Hash of the transaction being traced (zero if dangling call)
 }
 
 // Tracer interface extends vm.EVMLogger and additionally

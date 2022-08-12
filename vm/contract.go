@@ -167,7 +167,7 @@ func (c *Contract) isCode(udest uint64) bool {
 	if c.analysis != nil {
 		return c.analysis.codeSegment(udest)
 	}
-	// thor: although the codehash won't be empty currently, still keep the check logic.
+	// workshare: although the codehash won't be empty currently, still keep the check logic.
 	//
 	// Do we have a contract hash already?
 	// If we do have a hash, that means it's a 'regular' contract.

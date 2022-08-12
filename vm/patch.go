@@ -1,10 +1,10 @@
 // Tale of two dependencies.
 // Reason:
-// Currently, thor depends on v1.8.14 of go-ethereum project.
+// Currently, workshare depends on v1.8.14 of go-ethereum project.
 // However, Constantinople upgrade requires v1.8.27 go-ethereum dependency.
 // Solution:
 // This patch exists to temporarily reflect the change of library before
-// thor finally upgrades fully to dependency v1.8.27.
+// workshare finally upgrades fully to dependency v1.8.27.
 
 package vm
 

@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/miniBamboo/workshare/api/transactions"
 	"github.com/miniBamboo/workshare/runtime"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 //Account for marshal account
@@ -26,7 +26,7 @@ type CallData struct {
 	Data     string                `json:"data"`
 	Gas      uint64                `json:"gas"`
 	GasPrice *math.HexOrDecimal256 `json:"gasPrice"`
-	Caller   *thor.Address         `json:"caller"`
+	Caller   *workshare.Address    `json:"caller"`
 }
 
 type CallResult struct {
@@ -58,7 +58,7 @@ func convertCallResultWithInputGas(vo *runtime.Output, inputGas uint64) *CallRes
 			Address: txEvent.Address,
 			Data:    hexutil.Encode(txEvent.Data),
 		}
-		event.Topics = make([]thor.Bytes32, len(txEvent.Topics))
+		event.Topics = make([]workshare.Bytes32, len(txEvent.Topics))
 		for k, topic := range txEvent.Topics {
 			event.Topics[k] = topic
 		}
@@ -84,7 +84,7 @@ func convertCallResultWithInputGas(vo *runtime.Output, inputGas uint64) *CallRes
 }
 
 type Clause struct {
-	To    *thor.Address         `json:"to"`
+	To    *workshare.Address    `json:"to"`
 	Value *math.HexOrDecimal256 `json:"value"`
 	Data  string                `json:"data"`
 }
@@ -98,8 +98,8 @@ type BatchCallData struct {
 	Gas        uint64                `json:"gas"`
 	GasPrice   *math.HexOrDecimal256 `json:"gasPrice"`
 	ProvedWork *math.HexOrDecimal256 `json:"provedWork"`
-	Caller     *thor.Address         `json:"caller"`
-	GasPayer   *thor.Address         `json:"gasPayer"`
+	Caller     *workshare.Address    `json:"caller"`
+	GasPayer   *workshare.Address    `json:"gasPayer"`
 	Expiration uint32                `json:"expiration"`
 	BlockRef   string                `json:"blockRef"`
 }

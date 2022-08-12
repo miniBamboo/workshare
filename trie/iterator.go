@@ -1,4 +1,4 @@
-// Copyright 2014 The go-ethereum Authors
+// Copyright 2014 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ import (
 	"container/heap"
 	"errors"
 
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // Iterator is a key-value trie iterator that traverses a Trie.
@@ -82,7 +82,7 @@ type NodeIterator interface {
 	Error() error
 
 	// Hash returns the hash of the current node.
-	Hash() thor.Bytes32
+	Hash() workshare.Bytes32
 
 	// Node calls the handler with the blob of the current node if any.
 	Node(handler func(blob []byte) error) error
@@ -92,7 +92,7 @@ type NodeIterator interface {
 
 	// Parent returns the hash of the parent of the current node. The hash may be the one
 	// grandparent if the immediate parent is an internal node with no hash.
-	Parent() thor.Bytes32
+	Parent() workshare.Bytes32
 
 	// Path returns the hex-encoded path to the current node.
 	// Callers must not retain references to the return value after calling Next.
@@ -116,11 +116,11 @@ type NodeIterator interface {
 // nodeIteratorState represents the iteration state at one particular node of the
 // trie, which can be resumed at a later invocation.
 type nodeIteratorState struct {
-	hash    thor.Bytes32 // Hash of the node being iterated (nil if not standalone)
-	node    node         // Trie node being iterated
-	parent  thor.Bytes32 // Hash of the first full ancestor node (nil if current is the root)
-	index   int          // Child to be processed next
-	pathlen int          // Length of the path to this node
+	hash    workshare.Bytes32 // Hash of the node being iterated (nil if not standalone)
+	node    node              // Trie node being iterated
+	parent  workshare.Bytes32 // Hash of the first full ancestor node (nil if current is the root)
+	index   int               // Child to be processed next
+	pathlen int               // Length of the path to this node
 }
 
 type nodeIterator struct {
@@ -160,9 +160,9 @@ func newNodeIterator(trie *Trie, start []byte, filter func(seq uint64) bool, ext
 	return it
 }
 
-func (it *nodeIterator) Hash() thor.Bytes32 {
+func (it *nodeIterator) Hash() workshare.Bytes32 {
 	if len(it.stack) == 0 {
-		return thor.Bytes32{}
+		return workshare.Bytes32{}
 	}
 	return it.stack[len(it.stack)-1].hash
 }
@@ -202,9 +202,9 @@ func (it *nodeIterator) SeqNum() uint64 {
 	return 0
 }
 
-func (it *nodeIterator) Parent() thor.Bytes32 {
+func (it *nodeIterator) Parent() workshare.Bytes32 {
 	if len(it.stack) == 0 {
-		return thor.Bytes32{}
+		return workshare.Bytes32{}
 	}
 	return it.stack[len(it.stack)-1].parent
 }
@@ -332,7 +332,7 @@ func (it *nodeIterator) peek(descend bool) (*nodeIteratorState, *int, []byte, er
 	for len(it.stack) > 0 {
 		parent := it.stack[len(it.stack)-1]
 		ancestor := parent.hash
-		if (ancestor == thor.Bytes32{}) {
+		if (ancestor == workshare.Bytes32{}) {
 			ancestor = parent.parent
 		}
 		state, path, ok := it.nextChild(parent, ancestor)
@@ -360,7 +360,7 @@ func (st *nodeIteratorState) resolve(tr *Trie, path []byte) error {
 	return nil
 }
 
-func (it *nodeIterator) nextChild(parent *nodeIteratorState, ancestor thor.Bytes32) (*nodeIteratorState, []byte, bool) {
+func (it *nodeIterator) nextChild(parent *nodeIteratorState, ancestor workshare.Bytes32) (*nodeIteratorState, []byte, bool) {
 	switch node := parent.node.(type) {
 	case *fullNode:
 		// Full node, move to the first non-nil child.
@@ -469,7 +469,7 @@ func NewDifferenceIterator(a, b NodeIterator) (NodeIterator, *int) {
 	return it, &it.count
 }
 
-func (it *differenceIterator) Hash() thor.Bytes32 {
+func (it *differenceIterator) Hash() workshare.Bytes32 {
 	return it.b.Hash()
 }
 
@@ -481,7 +481,7 @@ func (it *differenceIterator) SeqNum() uint64 {
 	return it.b.SeqNum()
 }
 
-func (it *differenceIterator) Parent() thor.Bytes32 {
+func (it *differenceIterator) Parent() workshare.Bytes32 {
 	return it.b.Parent()
 }
 
@@ -529,7 +529,7 @@ func (it *differenceIterator) Next(bool) bool {
 			return true
 		case 0:
 			// a and b are identical; skip this whole subtree if the nodes have hashes
-			hasHash := it.a.Hash() == thor.Bytes32{}
+			hasHash := it.a.Hash() == workshare.Bytes32{}
 			if !it.b.Next(hasHash) {
 				return false
 			}
@@ -580,7 +580,7 @@ func NewUnionIterator(iters []NodeIterator) (NodeIterator, *int) {
 	return ui, &ui.count
 }
 
-func (it *unionIterator) Hash() thor.Bytes32 {
+func (it *unionIterator) Hash() workshare.Bytes32 {
 	return (*it.items)[0].Hash()
 }
 
@@ -592,7 +592,7 @@ func (it *unionIterator) SeqNum() uint64 {
 	return (*it.items)[0].SeqNum()
 }
 
-func (it *unionIterator) Parent() thor.Bytes32 {
+func (it *unionIterator) Parent() workshare.Bytes32 {
 	return (*it.items)[0].Parent()
 }
 
@@ -639,7 +639,7 @@ func (it *unionIterator) Next(descend bool) bool {
 	for len(*it.items) > 0 && ((!descend && bytes.HasPrefix((*it.items)[0].Path(), least.Path())) || compareNodes(least, (*it.items)[0]) == 0) {
 		skipped := heap.Pop(it.items).(NodeIterator)
 		// Skip the whole subtree if the nodes have hashes; otherwise just skip this node
-		if skipped.Next(skipped.Hash() == thor.Bytes32{}) {
+		if skipped.Next(skipped.Hash() == workshare.Bytes32{}) {
 			it.count++
 			// If there are more elements, push the iterator back on the heap
 			heap.Push(it.items, skipped)

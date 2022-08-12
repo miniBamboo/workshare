@@ -17,8 +17,8 @@ import (
 	"github.com/miniBamboo/workshare/genesis"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +34,7 @@ func signTx(tx *tx.Transaction, acc genesis.DevAccount) *tx.Transaction {
 	return tx.WithSignature(sig)
 }
 
-func newTx(chainTag byte, clauses []*tx.Clause, gas uint64, blockRef tx.BlockRef, expiration uint32, dependsOn *thor.Bytes32, features tx.Features, from genesis.DevAccount) *tx.Transaction {
+func newTx(chainTag byte, clauses []*tx.Clause, gas uint64, blockRef tx.BlockRef, expiration uint32, dependsOn *workshare.Bytes32, features tx.Features, from genesis.DevAccount) *tx.Transaction {
 	builder := new(tx.Builder).ChainTag(chainTag)
 	for _, c := range clauses {
 		builder.Clause(c)
@@ -94,7 +94,7 @@ func TestExecutable(t *testing.T) {
 		{newTx(0, nil, math.MaxUint64, tx.BlockRef{}, 100, nil, tx.Features(0), acc), false, "gas too large"},
 		{newTx(0, nil, 21000, tx.BlockRef{1}, 100, nil, tx.Features(0), acc), true, "block ref out of schedule"},
 		{newTx(0, nil, 21000, tx.BlockRef{0}, 0, nil, tx.Features(0), acc), true, "expired"},
-		{newTx(0, nil, 21000, tx.BlockRef{0}, 100, &thor.Bytes32{}, tx.Features(0), acc), false, ""},
+		{newTx(0, nil, 21000, tx.BlockRef{0}, 100, &workshare.Bytes32{}, tx.Features(0), acc), false, ""},
 	}
 
 	for _, tt := range tests {

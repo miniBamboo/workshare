@@ -11,12 +11,12 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/miniBamboo/workshare/block"
-	"github.com/miniBamboo/workshare/builtin"
-	"github.com/miniBamboo/workshare/poa"
+	"github.com/miniBamboo/workshare/consensus/builtin"
+	"github.com/miniBamboo/workshare/consensus/poa"
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/miniBamboo/workshare/xenv"
 )
 
@@ -47,11 +47,11 @@ func (c *Consensus) validate(
 		return nil, nil, err
 	}
 
-	hasAuthorityEvent := func() bool {
+	hasAuworkshareityEvent := func() bool {
 		for _, r := range receipts {
 			for _, o := range r.Outputs {
 				for _, ev := range o.Events {
-					if ev.Address == builtin.Authority.Address {
+					if ev.Address == builtin.Auworkshareity.Address {
 						return true
 					}
 				}
@@ -60,8 +60,8 @@ func (c *Consensus) validate(
 		return false
 	}()
 
-	// if no event emitted from Authority contract, it's believed that the candidates list not changed
-	if !hasAuthorityEvent {
+	// if no event emitted from Auworkshareity contract, it's believed that the candidates list not changed
+	if !hasAuworkshareityEvent {
 
 		// if no endorsor related transfer, or no event emitted from Params contract, the proposers list
 		// can be reused
@@ -96,11 +96,11 @@ func (c *Consensus) validateBlockHeader(header *block.Header, parent *block.Head
 		return consensusError(fmt.Sprintf("block timestamp behind parents: parent %v, current %v", parent.Timestamp(), header.Timestamp()))
 	}
 
-	if (header.Timestamp()-parent.Timestamp())%thor.BlockInterval != 0 {
+	if (header.Timestamp()-parent.Timestamp())%workshare.BlockInterval != 0 {
 		return consensusError(fmt.Sprintf("block interval not rounded: parent %v, current %v", parent.Timestamp(), header.Timestamp()))
 	}
 
-	if header.Timestamp() > nowTimestamp+thor.BlockInterval {
+	if header.Timestamp() > nowTimestamp+workshare.BlockInterval {
 		return errFutureBlock
 	}
 
@@ -160,12 +160,12 @@ func (c *Consensus) validateProposer(header *block.Header, parent *block.Header,
 		return nil, consensusError(fmt.Sprintf("block signer unavailable: %v", err))
 	}
 
-	authority := builtin.Authority.Native(st)
+	auworkshareity := builtin.Auworkshareity.Native(st)
 	var candidates *poa.Candidates
 	if entry, ok := c.candidatesCache.Get(parent.ID()); ok {
 		candidates = entry.(*poa.Candidates).Copy()
 	} else {
-		list, err := authority.AllCandidates()
+		list, err := auworkshareity.AllCandidates()
 		if err != nil {
 			return nil, err
 		}
@@ -202,7 +202,7 @@ func (c *Consensus) validateProposer(header *block.Header, parent *block.Header,
 	}
 
 	for _, u := range updates {
-		if _, err := authority.Update(u.Address, u.Active); err != nil {
+		if _, err := auworkshareity.Update(u.Address, u.Active); err != nil {
 			return nil, err
 		}
 		if !candidates.Update(u.Address, u.Active) {
@@ -227,7 +227,7 @@ func (c *Consensus) validateBlockBody(blk *block.Block) error {
 			return consensusError(fmt.Sprintf("tx signer unavailable: %v", err))
 		}
 
-		if header.Number() >= c.forkConfig.BLOCKLIST && thor.IsOriginBlocked(origin) {
+		if header.Number() >= c.forkConfig.BLOCKLIST && workshare.IsOriginBlocked(origin) {
 			return consensusError(fmt.Sprintf("tx origin blocked got packed: %v", origin))
 		}
 
@@ -252,7 +252,7 @@ func (c *Consensus) verifyBlock(blk *block.Block, state *state.State, blockConfl
 	var totalGasUsed uint64
 	txs := blk.Transactions()
 	receipts := make(tx.Receipts, 0, len(txs))
-	processedTxs := make(map[thor.Bytes32]bool)
+	processedTxs := make(map[workshare.Bytes32]bool)
 	header := blk.Header()
 	signer, _ := header.Signer()
 	chain := c.repo.NewChain(header.ParentID())
@@ -270,7 +270,7 @@ func (c *Consensus) verifyBlock(blk *block.Block, state *state.State, blockConfl
 		},
 		c.forkConfig)
 
-	findTx := func(txID thor.Bytes32) (found bool, reverted bool, err error) {
+	findTx := func(txID workshare.Bytes32) (found bool, reverted bool, err error) {
 		if reverted, ok := processedTxs[txID]; ok {
 			return true, reverted, nil
 		}

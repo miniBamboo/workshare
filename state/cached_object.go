@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/miniBamboo/workshare/muxdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 var codeCache, _ = lru.NewARC(512)
@@ -17,18 +17,18 @@ var codeCache, _ = lru.NewARC(512)
 // cachedObject to cache code and storage of an account.
 type cachedObject struct {
 	db   *muxdb.MuxDB
-	addr thor.Address
+	addr workshare.Address
 	data Account
 	meta AccountMetadata
 
 	cache struct {
 		code        []byte
 		storageTrie *muxdb.Trie
-		storage     map[thor.Bytes32]rlp.RawValue
+		storage     map[workshare.Bytes32]rlp.RawValue
 	}
 }
 
-func newCachedObject(db *muxdb.MuxDB, addr thor.Address, data *Account, meta *AccountMetadata) *cachedObject {
+func newCachedObject(db *muxdb.MuxDB, addr workshare.Address, data *Account, meta *AccountMetadata) *cachedObject {
 	return &cachedObject{db: db, addr: addr, data: *data, meta: *meta}
 }
 
@@ -43,7 +43,7 @@ func (co *cachedObject) getOrCreateStorageTrie() *muxdb.Trie {
 
 	trie := co.db.NewTrie(
 		StorageTrieName(co.meta.StorageID),
-		thor.BytesToBytes32(co.data.StorageRoot),
+		workshare.BytesToBytes32(co.data.StorageRoot),
 		co.meta.StorageCommitNum,
 		co.meta.StorageDistinctNum)
 
@@ -52,7 +52,7 @@ func (co *cachedObject) getOrCreateStorageTrie() *muxdb.Trie {
 }
 
 // GetStorage returns storage value for given key.
-func (co *cachedObject) GetStorage(key thor.Bytes32, steadyBlockNum uint32) (rlp.RawValue, error) {
+func (co *cachedObject) GetStorage(key workshare.Bytes32, steadyBlockNum uint32) (rlp.RawValue, error) {
 	cache := &co.cache
 	// retrive from storage cache
 	if cache.storage != nil {
@@ -60,7 +60,7 @@ func (co *cachedObject) GetStorage(key thor.Bytes32, steadyBlockNum uint32) (rlp
 			return v, nil
 		}
 	} else {
-		cache.storage = make(map[thor.Bytes32]rlp.RawValue)
+		cache.storage = make(map[workshare.Bytes32]rlp.RawValue)
 	}
 	// not found in cache
 

@@ -11,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/miniBamboo/workshare/block"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type blockStats struct {
@@ -48,6 +48,6 @@ func (s *blockStats) LogContext(last *block.Header) []interface{} {
 	}
 }
 
-func shortID(id thor.Bytes32) string {
+func shortID(id workshare.Bytes32) string {
 	return fmt.Sprintf("[#%v…%x]", block.Number(id), id[28:])
 }

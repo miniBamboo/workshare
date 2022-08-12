@@ -14,20 +14,20 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/miniBamboo/workshare/block"
-	"github.com/miniBamboo/workshare/builtin"
 	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/consensus/builtin"
+	"github.com/miniBamboo/workshare/consensus/vrf"
 	"github.com/miniBamboo/workshare/genesis"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/packer"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
-	"github.com/miniBamboo/workshare/vrf"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
 func txBuilder(tag byte) *tx.Builder {
-	address := thor.BytesToAddress([]byte("addr"))
+	address := workshare.BytesToAddress([]byte("addr"))
 	return new(tx.Builder).
 		GasPriceCoef(1).
 		Gas(1000000).
@@ -49,7 +49,7 @@ type testConsensus struct {
 	pk         *ecdsa.PrivateKey
 	parent     *block.Block
 	original   *block.Block
-	forkConfig thor.ForkConfig
+	forkConfig workshare.ForkConfig
 	tag        byte
 }
 
@@ -58,16 +58,16 @@ func newTestConsensus() (*testConsensus, error) {
 
 	launchTime := uint64(1526400000)
 	gen := new(genesis.Builder).
-		GasLimit(thor.InitialGasLimit).
+		GasLimit(workshare.InitialGasLimit).
 		Timestamp(launchTime).
 		State(func(state *state.State) error {
 			bal, _ := new(big.Int).SetString("1000000000000000000000000000", 10)
-			state.SetCode(builtin.Authority.Address, builtin.Authority.RuntimeBytecodes())
-			builtin.Params.Native(state).Set(thor.KeyExecutorAddress, new(big.Int).SetBytes(genesis.DevAccounts()[0].Address[:]))
+			state.SetCode(builtin.Auworkshareity.Address, builtin.Auworkshareity.RuntimeBytecodes())
+			builtin.Params.Native(state).Set(workshare.KeyExecutorAddress, new(big.Int).SetBytes(genesis.DevAccounts()[0].Address[:]))
 			for _, acc := range genesis.DevAccounts() {
 				state.SetBalance(acc.Address, bal)
 				state.SetEnergy(acc.Address, bal, launchTime)
-				builtin.Authority.Native(state).Add(acc.Address, acc.Address, thor.Bytes32{})
+				builtin.Auworkshareity.Native(state).Add(acc.Address, acc.Address, workshare.Bytes32{})
 			}
 			return nil
 		})
@@ -83,14 +83,14 @@ func newTestConsensus() (*testConsensus, error) {
 		return nil, err
 	}
 
-	forkConfig := thor.NoFork
+	forkConfig := workshare.NoFork
 	forkConfig.BLOCKLIST = 0
 	forkConfig.VIP214 = 2
 
 	proposer := genesis.DevAccounts()[0]
 	p := packer.New(repo, stater, proposer.Address, &proposer.Address, forkConfig)
 	parentSum, _ := repo.GetBlockSummary(parent.Header().ID())
-	flow, err := p.Schedule(parentSum, uint64(parent.Header().Timestamp()+100*thor.BlockInterval))
+	flow, err := p.Schedule(parentSum, uint64(parent.Header().Timestamp()+100*workshare.BlockInterval))
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func newTestConsensus() (*testConsensus, error) {
 	proposer2 := genesis.DevAccounts()[1]
 	p2 := packer.New(repo, stater, proposer2.Address, &proposer2.Address, forkConfig)
 	b1sum, _ := repo.GetBlockSummary(b1.Header().ID())
-	flow2, err := p2.Schedule(b1sum, uint64(b1.Header().Timestamp()+100*thor.BlockInterval))
+	flow2, err := p2.Schedule(b1sum, uint64(b1.Header().Timestamp()+100*workshare.BlockInterval))
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +276,7 @@ func TestValidateBlockHeader(t *testing.T) {
 		{
 			"ErrFutureBlock", func(t *testing.T) {
 				builder := tc.builder(tc.original.Header())
-				blk, err := tc.sign(builder.Timestamp(tc.time + thor.BlockInterval*2))
+				blk, err := tc.sign(builder.Timestamp(tc.time + workshare.BlockInterval*2))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -362,7 +362,7 @@ func TestValidateBlockHeader(t *testing.T) {
 					fmt.Sprintf(
 						"block alpha invalid: want %v, have %v",
 						tc.parent.Header().StateRoot(),
-						thor.Bytes32(alpha),
+						workshare.Bytes32(alpha),
 					),
 				)
 				assert.Equal(t, expected, err)
@@ -525,7 +525,7 @@ func TestValidateBlockBody(t *testing.T) {
 		},
 		{
 			"TxOriginBlocked", func(t *testing.T) {
-				thor.MockBlocklist([]string{genesis.DevAccounts()[9].Address.String()})
+				workshare.MockBlocklist([]string{genesis.DevAccounts()[9].Address.String()})
 				tx := txBuilder(tc.tag).Build()
 				sig, _ := crypto.Sign(tx.SigningHash().Bytes(), genesis.DevAccounts()[9].PrivateKey)
 				tx = tx.WithSignature(sig)
@@ -639,8 +639,8 @@ func TestValidateProposer(t *testing.T) {
 				err = tc.consent(blk)
 				expected := consensusError(
 					fmt.Sprintf(
-						"block signer invalid: %v unauthorized block proposer",
-						thor.Address(crypto.PubkeyToAddress(pk.PublicKey)),
+						"block signer invalid: %v unauworkshareized block proposer",
+						workshare.Address(crypto.PubkeyToAddress(pk.PublicKey)),
 					),
 				)
 				assert.Equal(t, expected, err)
@@ -658,7 +658,7 @@ func TestValidateProposer(t *testing.T) {
 					fmt.Sprintf(
 						"block timestamp unscheduled: t %v, s %v",
 						blk.Header().Timestamp(),
-						thor.Address(crypto.PubkeyToAddress(genesis.DevAccounts()[3].PrivateKey.PublicKey)),
+						workshare.Address(crypto.PubkeyToAddress(genesis.DevAccounts()[3].PrivateKey.PublicKey)),
 					),
 				)
 				assert.Equal(t, expected, err)

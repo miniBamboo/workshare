@@ -12,13 +12,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTx(t *testing.T) {
-	to, _ := thor.ParseAddress("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed")
+	to, _ := workshare.ParseAddress("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed")
 	trx := new(tx.Builder).ChainTag(1).
 		BlockRef(tx.BlockRef{0, 0, 0, 0, 0xaa, 0xbb, 0xcc, 0xdd}).
 		Expiration(32).
@@ -30,7 +30,7 @@ func TestTx(t *testing.T) {
 		Nonce(12345678).Build()
 
 	assert.Equal(t, "0x2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478", trx.SigningHash().String())
-	assert.Equal(t, thor.Bytes32{}, trx.ID())
+	assert.Equal(t, workshare.Bytes32{}, trx.ID())
 
 	assert.Equal(t, uint64(21000), func() uint64 { g, _ := new(tx.Builder).Build().IntrinsicGas(); return g }())
 	assert.Equal(t, uint64(37432), func() uint64 { g, _ := trx.IntrinsicGas(); return g }())
@@ -58,7 +58,7 @@ func TestTx(t *testing.T) {
 }
 
 func TestDelegatedTx(t *testing.T) {
-	to, _ := thor.ParseAddress("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed")
+	to, _ := workshare.ParseAddress("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed")
 	origin, _ := hex.DecodeString("7582be841ca040aa940fff6c05773129e135623e41acce3e0b8ba520dc1ae26a")
 	delegator, _ := hex.DecodeString("321d6443bc6177273b5abf54210fe806d451d6b7973bccc2384ef78bbcd0bf51")
 
@@ -83,7 +83,7 @@ func TestDelegatedTx(t *testing.T) {
 	sig, _ := crypto.Sign(trx.SigningHash().Bytes(), p1)
 
 	o := crypto.PubkeyToAddress(p1.PublicKey)
-	hash := trx.DelegatorSigningHash(thor.Address(o))
+	hash := trx.DelegatorSigningHash(workshare.Address(o))
 	p2, _ := crypto.ToECDSA(delegator)
 	delegatorSig, _ := crypto.Sign(hash.Bytes(), p2)
 
@@ -114,24 +114,24 @@ func TestDelegatedTx(t *testing.T) {
 func TestIntrinsicGas(t *testing.T) {
 	gas, err := tx.IntrinsicGas()
 	assert.Nil(t, err)
-	assert.Equal(t, thor.TxGas+thor.ClauseGas, gas)
+	assert.Equal(t, workshare.TxGas+workshare.ClauseGas, gas)
 
-	gas, err = tx.IntrinsicGas(tx.NewClause(&thor.Address{}))
+	gas, err = tx.IntrinsicGas(tx.NewClause(&workshare.Address{}))
 	assert.Nil(t, err)
-	assert.Equal(t, thor.TxGas+thor.ClauseGas, gas)
+	assert.Equal(t, workshare.TxGas+workshare.ClauseGas, gas)
 
 	gas, err = tx.IntrinsicGas(tx.NewClause(nil))
 	assert.Nil(t, err)
-	assert.Equal(t, thor.TxGas+thor.ClauseGasContractCreation, gas)
+	assert.Equal(t, workshare.TxGas+workshare.ClauseGasContractCreation, gas)
 
-	gas, err = tx.IntrinsicGas(tx.NewClause(&thor.Address{}), tx.NewClause(&thor.Address{}))
+	gas, err = tx.IntrinsicGas(tx.NewClause(&workshare.Address{}), tx.NewClause(&workshare.Address{}))
 	assert.Nil(t, err)
-	assert.Equal(t, thor.TxGas+thor.ClauseGas*2, gas)
+	assert.Equal(t, workshare.TxGas+workshare.ClauseGas*2, gas)
 }
 
 func BenchmarkTxMining(b *testing.B) {
 	tx := new(tx.Builder).Build()
-	signer := thor.BytesToAddress([]byte("acc1"))
+	signer := workshare.BytesToAddress([]byte("acc1"))
 	maxWork := &big.Int{}
 	eval := tx.EvaluateWork(signer)
 	for i := 0; i < b.N; i++ {

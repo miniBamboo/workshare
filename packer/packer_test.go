@@ -13,15 +13,15 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/miniBamboo/workshare/builtin"
 	"github.com/miniBamboo/workshare/chain"
 	"github.com/miniBamboo/workshare/consensus"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/genesis"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/packer"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -61,7 +61,7 @@ func (ti *txIterator) Next() *tx.Transaction {
 	return tx
 }
 
-func (ti *txIterator) OnProcessed(txID thor.Bytes32, err error) {
+func (ti *txIterator) OnProcessed(txID workshare.Bytes32, err error) {
 }
 
 func TestP(t *testing.T) {
@@ -85,7 +85,7 @@ func TestP(t *testing.T) {
 
 	for {
 		best := repo.BestBlockSummary()
-		p := packer.New(repo, stater, a1.Address, &a1.Address, thor.NoFork)
+		p := packer.New(repo, stater, a1.Address, &a1.Address, workshare.NoFork)
 		flow, err := p.Schedule(best, uint64(time.Now().Unix()))
 		if err != nil {
 			t.Fatal(err)
@@ -99,7 +99,7 @@ func TestP(t *testing.T) {
 		blk, stage, receipts, err := flow.Pack(genesis.DevAccounts()[0].PrivateKey, 0)
 		root, _ := stage.Commit()
 		assert.Equal(t, root, blk.Header().StateRoot())
-		fmt.Println(consensus.New(repo, stater, thor.NoFork).Process(blk, uint64(time.Now().Unix()*2), 0))
+		fmt.Println(consensus.New(repo, stater, workshare.NoFork).Process(blk, uint64(time.Now().Unix()*2), 0))
 
 		if err := repo.AddBlock(blk, receipts, 0); err != nil {
 			t.Fatal(err)
@@ -124,19 +124,19 @@ func TestForkVIP191(t *testing.T) {
 	stater := state.NewStater(db)
 
 	b0, _, _, err := new(genesis.Builder).
-		GasLimit(thor.InitialGasLimit).
+		GasLimit(workshare.InitialGasLimit).
 		Timestamp(launchTime).
-		ForkConfig(thor.NoFork).
+		ForkConfig(workshare.NoFork).
 		State(func(state *state.State) error {
 			// setup builtin contracts
-			state.SetCode(builtin.Authority.Address, builtin.Authority.RuntimeBytecodes())
+			state.SetCode(builtin.Auworkshareity.Address, builtin.Auworkshareity.RuntimeBytecodes())
 			state.SetCode(builtin.Extension.Address, builtin.Extension.RuntimeBytecodes())
 
 			bal, _ := new(big.Int).SetString("1000000000000000000000000000", 10)
 			state.SetBalance(a1.Address, bal)
 			state.SetEnergy(a1.Address, bal, launchTime)
 
-			builtin.Authority.Native(state).Add(a1.Address, a1.Address, thor.BytesToBytes32([]byte{}))
+			builtin.Auworkshareity.Native(state).Add(a1.Address, a1.Address, workshare.BytesToBytes32([]byte{}))
 			return nil
 		}).
 		Build(stater)
@@ -147,7 +147,7 @@ func TestForkVIP191(t *testing.T) {
 
 	repo, _ := chain.NewRepository(db, b0)
 
-	fc := thor.NoFork
+	fc := workshare.NoFork
 	fc.VIP191 = 1
 
 	best := repo.BestBlockSummary()
@@ -192,13 +192,13 @@ func TestBlocklist(t *testing.T) {
 
 	stater := state.NewStater(db)
 
-	forkConfig := thor.ForkConfig{
+	forkConfig := workshare.ForkConfig{
 		VIP191:    math.MaxUint32,
 		ETH_CONST: math.MaxUint32,
 		BLOCKLIST: 0,
 	}
 
-	thor.MockBlocklist([]string{a0.Address.String()})
+	workshare.MockBlocklist([]string{a0.Address.String()})
 
 	best := repo.BestBlockSummary()
 	p := packer.New(repo, stater, a0.Address, &a0.Address, forkConfig)

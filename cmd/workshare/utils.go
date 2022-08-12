@@ -45,9 +45,9 @@ import (
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/p2psrv"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
 	"github.com/miniBamboo/workshare/txpool"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -83,7 +83,7 @@ func loadOrGeneratePrivateKey(path string) (*ecdsa.PrivateKey, error) {
 
 func defaultConfigDir() string {
 	if home := homeDir(); home != "" {
-		return filepath.Join(home, ".org.vechain.thor")
+		return filepath.Join(home, ".org.vechain.workshare")
 	}
 	return ""
 }
@@ -93,11 +93,11 @@ func defaultDataDir() string {
 	// Try to place the data folder in the user's home dir
 	if home := homeDir(); home != "" {
 		if runtime.GOOS == "darwin" {
-			return filepath.Join(home, "Library", "Application Support", "org.vechain.thor")
+			return filepath.Join(home, "Library", "Application Support", "org.vechain.workshare")
 		} else if runtime.GOOS == "windows" {
-			return filepath.Join(home, "AppData", "Roaming", "org.vechain.thor")
+			return filepath.Join(home, "AppData", "Roaming", "org.vechain.workshare")
 		} else {
-			return filepath.Join(home, ".org.vechain.thor")
+			return filepath.Join(home, ".org.vechain.workshare")
 		}
 	}
 	// As we cannot guess a stable location, return empty and handle later
@@ -136,7 +136,7 @@ func requestBodyLimit(h http.Handler) http.Handler {
 }
 
 // middleware to verify 'x-genesis-id' header in request, and set to response headers.
-func handleXGenesisID(h http.Handler, genesisID thor.Bytes32) http.Handler {
+func handleXGenesisID(h http.Handler, genesisID workshare.Bytes32) http.Handler {
 	const headerKey = "x-genesis-id"
 	expectedID := genesisID.String()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -154,9 +154,9 @@ func handleXGenesisID(h http.Handler, genesisID thor.Bytes32) http.Handler {
 	})
 }
 
-// middleware to set 'x-thorest-ver' to response headers.
+// middleware to set 'x-workshareest-ver' to response headers.
 func handleXThorestVersion(h http.Handler) http.Handler {
-	const headerKey = "x-thorest-ver"
+	const headerKey = "x-workshareest-ver"
 	ver := doc.Version()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(headerKey, ver)
@@ -188,41 +188,41 @@ func readPasswordFromNewTTY(prompt string) (string, error) {
 	return pass, err
 }
 
-func selectGenesis(ctx *cli.Context) (*genesis.Genesis, thor.ForkConfig, error) {
+func selectGenesis(ctx *cli.Context) (*genesis.Genesis, workshare.ForkConfig, error) {
 	network := ctx.String(networkFlag.Name)
 	if network == "" {
 		_ = cli.ShowAppHelp(ctx)
-		return nil, thor.ForkConfig{}, errors.New("network flag not specified")
+		return nil, workshare.ForkConfig{}, errors.New("network flag not specified")
 	}
 
 	switch network {
 	case "test":
 		gene := genesis.NewTestnet()
-		return gene, thor.GetForkConfig(gene.ID()), nil
+		return gene, workshare.GetForkConfig(gene.ID()), nil
 	case "main":
 		gene := genesis.NewMainnet()
-		return gene, thor.GetForkConfig(gene.ID()), nil
+		return gene, workshare.GetForkConfig(gene.ID()), nil
 	default:
 		file, err := os.Open(network)
 		if err != nil {
-			return nil, thor.ForkConfig{}, errors.Wrap(err, "open genesis file")
+			return nil, workshare.ForkConfig{}, errors.Wrap(err, "open genesis file")
 		}
 		defer file.Close()
 
 		decoder := json.NewDecoder(file)
 		decoder.DisallowUnknownFields()
 
-		var forkConfig = thor.NoFork
+		var forkConfig = workshare.NoFork
 		var gen genesis.CustomGenesis
 		gen.ForkConfig = &forkConfig
 
 		if err := decoder.Decode(&gen); err != nil {
-			return nil, thor.ForkConfig{}, errors.Wrap(err, "decode genesis file")
+			return nil, workshare.ForkConfig{}, errors.Wrap(err, "decode genesis file")
 		}
 
 		customGen, err := genesis.NewCustomNet(&gen)
 		if err != nil {
-			return nil, thor.ForkConfig{}, errors.Wrap(err, "build genesis")
+			return nil, workshare.ForkConfig{}, errors.Wrap(err, "build genesis")
 		}
 
 		return customGen, forkConfig, nil
@@ -375,12 +375,12 @@ func initChainRepository(gene *genesis.Genesis, mainDB *muxdb.MuxDB, logDB *logd
 	return repo, nil
 }
 
-func beneficiary(ctx *cli.Context) (*thor.Address, error) {
+func beneficiary(ctx *cli.Context) (*workshare.Address, error) {
 	value := ctx.String(beneficiaryFlag.Name)
 	if value == "" {
 		return nil, nil
 	}
-	addr, err := thor.ParseAddress(value)
+	addr, err := workshare.ParseAddress(value)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid beneficiary")
 	}
@@ -434,7 +434,7 @@ func newP2PComm(ctx *cli.Context, repo *chain.Repository, txPool *txpool.TxPool,
 	}
 
 	opts := &p2psrv.Options{
-		Name:            common.MakeName("thor", fullVersion()),
+		Name:            common.MakeName("workshare", fullVersion()),
 		PrivateKey:      key,
 		MaxPeers:        ctx.Int(maxPeersFlag.Name),
 		ListenAddr:      fmt.Sprintf(":%v", ctx.Int(p2pPortFlag.Name)),
@@ -505,7 +505,7 @@ func (p *p2pComm) Stop() {
 	}
 }
 
-func startAPIServer(ctx *cli.Context, handler http.Handler, genesisID thor.Bytes32) (string, func(), error) {
+func startAPIServer(ctx *cli.Context, handler http.Handler, genesisID workshare.Bytes32) (string, func(), error) {
 	addr := ctx.String(apiAddrFlag.Name)
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -534,7 +534,7 @@ func printStartupMessage1(
 	repo *chain.Repository,
 	master *node.Master,
 	dataDir string,
-	forkConfig thor.ForkConfig,
+	forkConfig workshare.ForkConfig,
 ) {
 	bestBlock := repo.BestBlockSummary()
 
@@ -588,7 +588,7 @@ func printSoloStartupMessage(
 	repo *chain.Repository,
 	dataDir string,
 	apiURL string,
-	forkConfig thor.ForkConfig,
+	forkConfig workshare.ForkConfig,
 ) {
 	bestBlock := repo.BestBlockSummary()
 

@@ -7,7 +7,7 @@ package chain
 
 import (
 	"github.com/miniBamboo/workshare/block"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // ExtendedBlock extend block.Block with the obsolete flag.
@@ -28,7 +28,7 @@ func (r readBlockFunc) Read() ([]*ExtendedBlock, error) {
 }
 
 // NewBlockReader create BlockReader instance.
-func (r *Repository) NewBlockReader(position thor.Bytes32) BlockReader {
+func (r *Repository) NewBlockReader(position workshare.Bytes32) BlockReader {
 	return readBlockFunc(func() ([]*ExtendedBlock, error) {
 		bestChain := r.NewBestChain()
 		if bestChain.HeadID() == position {

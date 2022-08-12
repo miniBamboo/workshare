@@ -14,16 +14,16 @@ import (
 	"github.com/miniBamboo/workshare/abi"
 	"github.com/miniBamboo/workshare/chain"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
 	"github.com/miniBamboo/workshare/vm"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
 // BlockContext block context.
 type BlockContext struct {
-	Beneficiary thor.Address
-	Signer      thor.Address
+	Beneficiary workshare.Address
+	Signer      workshare.Address
 	Number      uint32
 	Time        uint64
 	GasLimit    uint64
@@ -32,9 +32,9 @@ type BlockContext struct {
 
 // TransactionContext transaction context.
 type TransactionContext struct {
-	ID         thor.Bytes32
-	Origin     thor.Address
-	GasPayer   thor.Address
+	ID         workshare.Bytes32
+	Origin     workshare.Address
+	GasPayer   workshare.Address
 	GasPrice   *big.Int
 	ProvedWork *big.Int
 	BlockRef   tx.BlockRef
@@ -77,8 +77,8 @@ func (env *Environment) Chain() *chain.Chain                     { return env.ch
 func (env *Environment) State() *state.State                     { return env.state }
 func (env *Environment) TransactionContext() *TransactionContext { return env.txCtx }
 func (env *Environment) BlockContext() *BlockContext             { return env.blockCtx }
-func (env *Environment) Caller() thor.Address                    { return thor.Address(env.contract.Caller()) }
-func (env *Environment) To() thor.Address                        { return thor.Address(env.contract.Address()) }
+func (env *Environment) Caller() workshare.Address               { return workshare.Address(env.contract.Caller()) }
+func (env *Environment) To() workshare.Address                   { return workshare.Address(env.contract.Address()) }
 
 func (env *Environment) UseGas(gas uint64) {
 	if !env.contract.UseGas(gas) {
@@ -93,7 +93,7 @@ func (env *Environment) ParseArgs(val interface{}) {
 	}
 }
 
-func (env *Environment) Log(abi *abi.Event, address thor.Address, topics []thor.Bytes32, args ...interface{}) {
+func (env *Environment) Log(abi *abi.Event, address workshare.Address, topics []workshare.Bytes32, args ...interface{}) {
 	data, err := abi.Encode(args...)
 	if err != nil {
 		panic(errors.WithMessage(err, "encode native event"))

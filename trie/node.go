@@ -1,4 +1,4 @@
-// Copyright 2014 The go-ethereum Authors
+// Copyright 2014 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -25,10 +25,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/miniBamboo/workshare/lowrlp"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
-var NonCryptoNodeHash = thor.BytesToBytes32(bytes.Repeat([]byte{0xff}, 32))
+var NonCryptoNodeHash = workshare.BytesToBytes32(bytes.Repeat([]byte{0xff}, 32))
 var nonCryptoNodeHashPlaceholder = []byte{0}
 
 var indices = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "[17]"}
@@ -52,7 +52,7 @@ type (
 		flags nodeFlag
 	}
 	hashNode struct {
-		Hash thor.Bytes32
+		Hash workshare.Bytes32
 		seq  uint64 // the sequence number
 	}
 	valueNode struct {
@@ -282,7 +282,7 @@ func decodeFull(hash *hashNode, buf, elems []byte, trailing *trailing, cacheGen 
 	return n, nil
 }
 
-const hashLen = len(thor.Bytes32{})
+const hashLen = len(workshare.Bytes32{})
 
 func decodeRef(buf []byte, trailing *trailing, cacheGen uint16) (node, []byte, error) {
 	kind, val, rest, err := rlp.Split(buf)
@@ -310,7 +310,7 @@ func decodeRef(buf []byte, trailing *trailing, cacheGen uint16) (node, []byte, e
 		return nil, nil, fmt.Errorf("invalid seq number: %v", err)
 	}
 	if valLen == 32 {
-		return &hashNode{Hash: thor.BytesToBytes32(val), seq: seq}, rest, nil
+		return &hashNode{Hash: workshare.BytesToBytes32(val), seq: seq}, rest, nil
 	}
 	if valLen == 1 && val[0] == nonCryptoNodeHashPlaceholder[0] {
 		return &hashNode{Hash: NonCryptoNodeHash, seq: seq}, rest, nil
@@ -349,6 +349,6 @@ func VerifyNodeHash(blob, expectedHash []byte) (bool, error) {
 	}
 
 	node := blob[:len(blob)-len(trailing)]
-	have := thor.Blake2b(node)
+	have := workshare.Blake2b(node)
 	return bytes.Equal(expectedHash, have.Bytes()), nil
 }

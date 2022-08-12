@@ -9,14 +9,14 @@ import (
 	"crypto/ecdsa"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type Master struct {
 	PrivateKey  *ecdsa.PrivateKey
-	Beneficiary *thor.Address
+	Beneficiary *workshare.Address
 }
 
-func (m *Master) Address() thor.Address {
-	return thor.Address(crypto.PubkeyToAddress(m.PrivateKey.PublicKey))
+func (m *Master) Address() workshare.Address {
+	return workshare.Address(crypto.PubkeyToAddress(m.PrivateKey.PublicKey))
 }

@@ -15,8 +15,8 @@ import (
 	"github.com/miniBamboo/workshare/chain"
 	"github.com/miniBamboo/workshare/co"
 	"github.com/miniBamboo/workshare/logdb"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 	"github.com/pmezard/go-difflib/difflib"
 	"gopkg.in/cheggaaa/pb.v1"
@@ -169,7 +169,7 @@ func verifyLogDB(ctx context.Context, endBlockNum uint32, repo *chain.Repository
 		evLogs      []*logdb.Event
 		trLogs      []*logdb.Transfer
 		logLimit    = uint32(0)
-		splitEvLogs = func(id thor.Bytes32) (logs []*logdb.Event) {
+		splitEvLogs = func(id workshare.Bytes32) (logs []*logdb.Event) {
 			if len(evLogs) == 0 {
 				return
 			}
@@ -186,7 +186,7 @@ func verifyLogDB(ctx context.Context, endBlockNum uint32, repo *chain.Repository
 			evLogs = nil
 			return
 		}
-		splitTrLogs = func(id thor.Bytes32) (logs []*logdb.Transfer) {
+		splitTrLogs = func(id workshare.Bytes32) (logs []*logdb.Transfer) {
 			if len(trLogs) == 0 {
 				return
 			}
@@ -274,7 +274,7 @@ func verifyLogDBPerBlock(
 	eventLogs []*logdb.Event,
 	transferLogs []*logdb.Transfer) error {
 
-	convertTopics := func(topics []thor.Bytes32) (r [5]*thor.Bytes32) {
+	convertTopics := func(topics []workshare.Bytes32) (r [5]*workshare.Bytes32) {
 		for i, t := range topics {
 			t := t
 			r[i] = &t
@@ -356,7 +356,7 @@ func jsonDiff(expected, actual interface{}) string {
 	return diff
 }
 
-func pumpBlockAndReceipts(ctx context.Context, repo *chain.Repository, headID thor.Bytes32, from, to uint32, ch chan<- *block.Block) error {
+func pumpBlockAndReceipts(ctx context.Context, repo *chain.Repository, headID workshare.Bytes32, from, to uint32, ch chan<- *block.Block) error {
 	var (
 		chain = repo.NewChain(headID)
 		buf   []*block.Block

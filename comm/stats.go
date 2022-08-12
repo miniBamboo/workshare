@@ -6,7 +6,7 @@
 package comm
 
 import (
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // type Traffic struct {
@@ -18,7 +18,7 @@ import (
 // PeerStats records stats of a peer.
 type PeerStats struct {
 	Name        string
-	BestBlockID thor.Bytes32
+	BestBlockID workshare.Bytes32
 	TotalScore  uint64
 	PeerID      string
 	NetAddr     string

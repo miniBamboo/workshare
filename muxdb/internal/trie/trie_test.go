@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	"github.com/miniBamboo/workshare/muxdb/internal/engine"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/trie"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/storage"
@@ -42,7 +42,7 @@ func TestTrie(t *testing.T) {
 
 	t.Run("basic", func(t *testing.T) {
 		back := newBackend()
-		tr := New(back, name, thor.Bytes32{}, 0, 0, false)
+		tr := New(back, name, workshare.Bytes32{}, 0, 0, false)
 		assert.Equal(t, name, tr.Name())
 
 		assert.False(t, tr.dirty)
@@ -58,7 +58,7 @@ func TestTrie(t *testing.T) {
 
 	t.Run("hash root", func(t *testing.T) {
 		back := newBackend()
-		tr := New(back, name, thor.Bytes32{}, 0, 0, false)
+		tr := New(back, name, workshare.Bytes32{}, 0, 0, false)
 
 		_tr := new(trie.Trie)
 
@@ -76,9 +76,9 @@ func TestTrie(t *testing.T) {
 
 	t.Run("fast get", func(t *testing.T) {
 		back := newBackend()
-		tr := New(back, name, thor.Bytes32{}, 0, 0, false)
+		tr := New(back, name, workshare.Bytes32{}, 0, 0, false)
 
-		var roots []thor.Bytes32
+		var roots []workshare.Bytes32
 		for i := 0; i < 100; i++ {
 			for j := 0; j < 100; j++ {
 				key := []byte(strconv.Itoa(i) + "_" + strconv.Itoa(j))

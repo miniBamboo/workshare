@@ -14,8 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/miniBamboo/workshare/block"
 	logdb "github.com/miniBamboo/workshare/logdb"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,12 +27,12 @@ func newTx() *tx.Transaction {
 	return tx.WithSignature(sig)
 }
 
-func randAddress() (addr thor.Address) {
+func randAddress() (addr workshare.Address) {
 	rand.Read(addr[:])
 	return
 }
 
-func randBytes32() (b thor.Bytes32) {
+func randBytes32() (b workshare.Bytes32) {
 	rand.Read(b[:])
 	return
 }
@@ -43,7 +43,7 @@ func newReceipt() *tx.Receipt {
 			{
 				Events: tx.Events{{
 					Address: randAddress(),
-					Topics:  []thor.Bytes32{randBytes32()},
+					Topics:  []workshare.Bytes32{randBytes32()},
 					Data:    randBytes32().Bytes(),
 				}},
 				Transfers: tx.Transfers{{
@@ -126,7 +126,7 @@ func TestEvents(t *testing.T) {
 				TxOrigin:    origin,
 				ClauseIndex: 0,
 				Address:     receipt.Outputs[0].Events[0].Address,
-				Topics:      [5]*thor.Bytes32{&receipt.Outputs[0].Events[0].Topics[0]},
+				Topics:      [5]*workshare.Bytes32{&receipt.Outputs[0].Events[0].Topics[0]},
 				Data:        receipt.Outputs[0].Events[0].Data,
 			})
 
@@ -168,7 +168,7 @@ func TestEvents(t *testing.T) {
 			{"query all events with criteria", &logdb.EventFilter{CriteriaSet: []*logdb.EventCriteria{{Address: &allEvents[1].Address}}}, allEvents.Filter(func(ev *logdb.Event) bool {
 				return ev.Address == allEvents[1].Address
 			})},
-			{"query all events with multi-criteria", &logdb.EventFilter{CriteriaSet: []*logdb.EventCriteria{{Address: &allEvents[1].Address}, {Topics: [5]*thor.Bytes32{allEvents[2].Topics[0]}}, {Topics: [5]*thor.Bytes32{allEvents[3].Topics[0]}}}}, allEvents.Filter(func(ev *logdb.Event) bool {
+			{"query all events with multi-criteria", &logdb.EventFilter{CriteriaSet: []*logdb.EventCriteria{{Address: &allEvents[1].Address}, {Topics: [5]*workshare.Bytes32{allEvents[2].Topics[0]}}, {Topics: [5]*workshare.Bytes32{allEvents[3].Topics[0]}}}}, allEvents.Filter(func(ev *logdb.Event) bool {
 				return ev.Address == allEvents[1].Address || *ev.Topics[0] == *allEvents[2].Topics[0] || *ev.Topics[0] == *allEvents[3].Topics[0]
 			})},
 		}

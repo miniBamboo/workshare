@@ -13,14 +13,14 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/miniBamboo/workshare/abi"
-	"github.com/miniBamboo/workshare/builtin"
 	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/runtime/statedb"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
 	Tx "github.com/miniBamboo/workshare/tx"
 	"github.com/miniBamboo/workshare/vm"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/miniBamboo/workshare/xenv"
 	"github.com/pkg/errors"
 )
@@ -68,8 +68,8 @@ type Output struct {
 	Transfers       tx.Transfers
 	LeftOverGas     uint64
 	RefundGas       uint64
-	VMErr           error         // VMErr identify the execution result of the contract function, not evm function's err.
-	ContractAddress *thor.Address // if create a new contract, or is nil.
+	VMErr           error              // VMErr identify the execution result of the contract function, not evm function's err.
+	ContractAddress *workshare.Address // if create a new contract, or is nil.
 }
 
 type TransactionExecutor struct {
@@ -92,7 +92,7 @@ func New(
 	chain *chain.Chain,
 	state *state.State,
 	ctx *xenv.BlockContext,
-	forkConfig thor.ForkConfig,
+	forkConfig workshare.ForkConfig,
 ) *Runtime {
 	currentChainConfig := baseChainConfig
 	currentChainConfig.ConstantinopleBlock = big.NewInt(int64(forkConfig.ETH_CONST))
@@ -105,13 +105,13 @@ func New(
 	// alloc precompiled contracts
 	if forkConfig.ETH_IST == ctx.Number {
 		for addr := range vm.PrecompiledContractsIstanbul {
-			if err := state.SetCode(thor.Address(addr), EmptyRuntimeBytecode); err != nil {
+			if err := state.SetCode(workshare.Address(addr), EmptyRuntimeBytecode); err != nil {
 				panic(err)
 			}
 		}
 	} else if ctx.Number == 0 {
 		for addr := range vm.PrecompiledContractsByzantium {
-			if err := state.SetCode(thor.Address(addr), EmptyRuntimeBytecode); err != nil {
+			if err := state.SetCode(workshare.Address(addr), EmptyRuntimeBytecode); err != nil {
 				panic(err)
 			}
 		}
@@ -157,19 +157,19 @@ func (rt *Runtime) newEVM(stateDB *statedb.StateDB, clauseIndex uint32, txCtx *x
 			}
 			// touch energy balance when token balance changed
 			// SHOULD be performed before transfer
-			senderEnergy, err := rt.state.GetEnergy(thor.Address(sender), rt.ctx.Time)
+			senderEnergy, err := rt.state.GetEnergy(workshare.Address(sender), rt.ctx.Time)
 			if err != nil {
 				panic(err)
 			}
-			recipientEnergy, err := rt.state.GetEnergy(thor.Address(recipient), rt.ctx.Time)
+			recipientEnergy, err := rt.state.GetEnergy(workshare.Address(recipient), rt.ctx.Time)
 			if err != nil {
 				panic(err)
 			}
 
-			if err := rt.state.SetEnergy(thor.Address(sender), senderEnergy, rt.ctx.Time); err != nil {
+			if err := rt.state.SetEnergy(workshare.Address(sender), senderEnergy, rt.ctx.Time); err != nil {
 				panic(err)
 			}
-			if err := rt.state.SetEnergy(thor.Address(recipient), recipientEnergy, rt.ctx.Time); err != nil {
+			if err := rt.state.SetEnergy(workshare.Address(recipient), recipientEnergy, rt.ctx.Time); err != nil {
 				panic(err)
 			}
 
@@ -177,8 +177,8 @@ func (rt *Runtime) newEVM(stateDB *statedb.StateDB, clauseIndex uint32, txCtx *x
 			stateDB.AddBalance(common.Address(recipient), amount)
 
 			stateDB.AddTransfer(&tx.Transfer{
-				Sender:    thor.Address(sender),
-				Recipient: thor.Address(recipient),
+				Sender:    workshare.Address(sender),
+				Recipient: workshare.Address(recipient),
 				Amount:    new(big.Int).Set(amount),
 			})
 		},
@@ -190,7 +190,7 @@ func (rt *Runtime) newEVM(stateDB *statedb.StateDB, clauseIndex uint32, txCtx *x
 			return common.Hash(id)
 		},
 		NewContractAddress: func(_ *vm.EVM, counter uint32) common.Address {
-			return common.Address(thor.CreateContractAddress(txCtx.ID, clauseIndex, counter))
+			return common.Address(workshare.CreateContractAddress(txCtx.ID, clauseIndex, counter))
 		},
 		InterceptContractCall: func(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]byte, error, bool) {
 			if evm.Depth() < 2 {
@@ -205,7 +205,7 @@ func (rt *Runtime) newEVM(stateDB *statedb.StateDB, clauseIndex uint32, txCtx *x
 				return nil, nil, false
 			}
 
-			abi, run, found := builtin.FindNativeCall(thor.Address(contract.Address()), contract.Input)
+			abi, run, found := builtin.FindNativeCall(workshare.Address(contract.Address()), contract.Input)
 			if !found {
 				lastNonNativeCallGas = contract.Gas
 				return nil, nil, false
@@ -232,7 +232,7 @@ func (rt *Runtime) newEVM(stateDB *statedb.StateDB, clauseIndex uint32, txCtx *x
 		},
 		OnCreateContract: func(_ *vm.EVM, contractAddr, caller common.Address) {
 			// set master for created contract
-			if err := rt.state.SetMaster(thor.Address(contractAddr), thor.Address(caller)); err != nil {
+			if err := rt.state.SetMaster(workshare.Address(contractAddr), workshare.Address(caller)); err != nil {
 				panic(err)
 			}
 
@@ -249,19 +249,19 @@ func (rt *Runtime) newEVM(stateDB *statedb.StateDB, clauseIndex uint32, txCtx *x
 		},
 		OnSuicideContract: func(_ *vm.EVM, contractAddr, tokenReceiver common.Address) {
 			// it's IMPORTANT to process energy before token
-			amount, err := rt.state.GetEnergy(thor.Address(contractAddr), rt.ctx.Time)
+			amount, err := rt.state.GetEnergy(workshare.Address(contractAddr), rt.ctx.Time)
 			if err != nil {
 				panic(err)
 			}
 			if amount.Sign() != 0 {
 				// add remained energy of suiciding contract to receiver.
 				// no need to clear contract's energy, vm will delete the whole contract later.
-				receiverEnergy, err := rt.state.GetEnergy(thor.Address(tokenReceiver), rt.ctx.Time)
+				receiverEnergy, err := rt.state.GetEnergy(workshare.Address(tokenReceiver), rt.ctx.Time)
 				if err != nil {
 					panic(err)
 				}
 				if err := rt.state.SetEnergy(
-					thor.Address(tokenReceiver),
+					workshare.Address(tokenReceiver),
 					new(big.Int).Add(receiverEnergy, amount),
 					rt.ctx.Time); err != nil {
 					panic(err)
@@ -290,8 +290,8 @@ func (rt *Runtime) newEVM(stateDB *statedb.StateDB, clauseIndex uint32, txCtx *x
 				stateDB.AddBalance(tokenReceiver, amount)
 
 				stateDB.AddTransfer(&tx.Transfer{
-					Sender:    thor.Address(contractAddr),
-					Recipient: thor.Address(tokenReceiver),
+					Sender:    workshare.Address(contractAddr),
+					Recipient: workshare.Address(tokenReceiver),
 					Amount:    amount,
 				})
 			}
@@ -320,7 +320,7 @@ func (rt *Runtime) PrepareClause(
 		data          []byte
 		leftOverGas   uint64
 		vmErr         error
-		contractAddr  *thor.Address
+		contractAddr  *workshare.Address
 		interruptFlag uint32
 	)
 
@@ -335,7 +335,7 @@ func (rt *Runtime) PrepareClause(
 		if clause.To() == nil {
 			var caddr common.Address
 			data, caddr, leftOverGas, vmErr = evm.Create(vm.AccountRef(txCtx.Origin), clause.Data(), gas, clause.Value())
-			contractAddr = (*thor.Address)(&caddr)
+			contractAddr = (*workshare.Address)(&caddr)
 		} else {
 			data, leftOverGas, vmErr = evm.Call(vm.AccountRef(txCtx.Origin), common.Address(*clause.To()), clause.Data(), gas, clause.Value())
 		}
@@ -459,7 +459,7 @@ func (rt *Runtime) PrepareTransaction(tx *tx.Transaction) (*TransactionExecutor,
 			}
 
 			// reward
-			rewardRatio, err := builtin.Params.Native(rt.state).Get(thor.KeyRewardRatio)
+			rewardRatio, err := builtin.Params.Native(rt.state).Get(workshare.KeyRewardRatio)
 			if err != nil {
 				return nil, err
 			}

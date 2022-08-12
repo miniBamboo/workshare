@@ -10,11 +10,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/consensus/vrf"
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
-	"github.com/miniBamboo/workshare/vrf"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -23,7 +23,7 @@ type Flow struct {
 	packer       *Packer
 	parentHeader *block.Header
 	runtime      *runtime.Runtime
-	processedTxs map[thor.Bytes32]bool // txID -> reverted
+	processedTxs map[workshare.Bytes32]bool // txID -> reverted
 	gasUsed      uint64
 	txs          tx.Transactions
 	receipts     tx.Receipts
@@ -40,7 +40,7 @@ func newFlow(
 		packer:       packer,
 		parentHeader: parentHeader,
 		runtime:      runtime,
-		processedTxs: make(map[thor.Bytes32]bool),
+		processedTxs: make(map[workshare.Bytes32]bool),
 		features:     features,
 	}
 }
@@ -60,7 +60,7 @@ func (f *Flow) TotalScore() uint64 {
 	return f.runtime.Context().TotalScore
 }
 
-func (f *Flow) findTx(txID thor.Bytes32) (found bool, reverted bool, err error) {
+func (f *Flow) findTx(txID workshare.Bytes32) (found bool, reverted bool, err error) {
 	if reverted, ok := f.processedTxs[txID]; ok {
 		return true, reverted, nil
 	}
@@ -79,7 +79,7 @@ func (f *Flow) findTx(txID thor.Bytes32) (found bool, reverted bool, err error) 
 // it will be adopted by the new block.
 func (f *Flow) Adopt(tx *tx.Transaction) error {
 	origin, _ := tx.Origin()
-	if f.runtime.Context().Number >= f.packer.forkConfig.BLOCKLIST && thor.IsOriginBlocked(origin) {
+	if f.runtime.Context().Number >= f.packer.forkConfig.BLOCKLIST && workshare.IsOriginBlocked(origin) {
 		return badTxError{"tx origin blocked"}
 	}
 
@@ -96,7 +96,7 @@ func (f *Flow) Adopt(tx *tx.Transaction) error {
 		return badTxError{"expired"}
 	case f.gasUsed+tx.Gas() > f.runtime.Context().GasLimit:
 		// has enough space to adopt minimum tx
-		if f.gasUsed+thor.TxGas+thor.ClauseGas <= f.runtime.Context().GasLimit {
+		if f.gasUsed+workshare.TxGas+workshare.ClauseGas <= f.runtime.Context().GasLimit {
 			// try to find a lower gas tx
 			return errTxNotAdoptableNow
 		}
@@ -140,7 +140,7 @@ func (f *Flow) Adopt(tx *tx.Transaction) error {
 
 // Pack build and sign the new block.
 func (f *Flow) Pack(privateKey *ecdsa.PrivateKey, newBlockConflicts uint32) (*block.Block, *state.Stage, tx.Receipts, error) {
-	if f.packer.nodeMaster != thor.Address(crypto.PubkeyToAddress(privateKey.PublicKey)) {
+	if f.packer.nodeMaster != workshare.Address(crypto.PubkeyToAddress(privateKey.PublicKey)) {
 		return nil, nil, nil, errors.New("private key mismatch")
 	}
 

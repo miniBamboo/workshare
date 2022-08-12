@@ -9,21 +9,21 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/miniBamboo/workshare/api/events"
 	"github.com/miniBamboo/workshare/logdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type LogMeta struct {
-	BlockID        thor.Bytes32 `json:"blockID"`
-	BlockNumber    uint32       `json:"blockNumber"`
-	BlockTimestamp uint64       `json:"blockTimestamp"`
-	TxID           thor.Bytes32 `json:"txID"`
-	TxOrigin       thor.Address `json:"txOrigin"`
-	ClauseIndex    uint32       `json:"clauseIndex"`
+	BlockID        workshare.Bytes32 `json:"blockID"`
+	BlockNumber    uint32            `json:"blockNumber"`
+	BlockTimestamp uint64            `json:"blockTimestamp"`
+	TxID           workshare.Bytes32 `json:"txID"`
+	TxOrigin       workshare.Address `json:"txOrigin"`
+	ClauseIndex    uint32            `json:"clauseIndex"`
 }
 
 type FilteredTransfer struct {
-	Sender    thor.Address          `json:"sender"`
-	Recipient thor.Address          `json:"recipient"`
+	Sender    workshare.Address     `json:"sender"`
+	Recipient workshare.Address     `json:"recipient"`
 	Amount    *math.HexOrDecimal256 `json:"amount"`
 	Meta      LogMeta               `json:"meta"`
 }

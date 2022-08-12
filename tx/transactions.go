@@ -7,8 +7,8 @@ package tx
 
 import (
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/trie"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 var (
@@ -19,7 +19,7 @@ var (
 type Transactions []*Transaction
 
 // RootHash computes merkle root hash of transactions.
-func (txs Transactions) RootHash() thor.Bytes32 {
+func (txs Transactions) RootHash() workshare.Bytes32 {
 	if len(txs) == 0 {
 		// optimized
 		return emptyRoot

@@ -11,24 +11,24 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/miniBamboo/workshare/muxdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStage(t *testing.T) {
 	db := muxdb.NewMem()
 
-	state := New(db, thor.Bytes32{}, 0, 0, 0)
+	state := New(db, workshare.Bytes32{}, 0, 0, 0)
 
-	addr := thor.BytesToAddress([]byte("acc1"))
+	addr := workshare.BytesToAddress([]byte("acc1"))
 
 	balance := big.NewInt(10)
 	code := []byte{1, 2, 3}
 
-	storage := map[thor.Bytes32]thor.Bytes32{
-		thor.BytesToBytes32([]byte("s1")): thor.BytesToBytes32([]byte("v1")),
-		thor.BytesToBytes32([]byte("s2")): thor.BytesToBytes32([]byte("v2")),
-		thor.BytesToBytes32([]byte("s3")): thor.BytesToBytes32([]byte("v3"))}
+	storage := map[workshare.Bytes32]workshare.Bytes32{
+		workshare.BytesToBytes32([]byte("s1")): workshare.BytesToBytes32([]byte("v1")),
+		workshare.BytesToBytes32([]byte("s2")): workshare.BytesToBytes32([]byte("v2")),
+		workshare.BytesToBytes32([]byte("s3")): workshare.BytesToBytes32([]byte("v3"))}
 
 	state.SetBalance(addr, balance)
 	state.SetCode(addr, code)
@@ -50,7 +50,7 @@ func TestStage(t *testing.T) {
 
 	assert.Equal(t, M(balance, nil), M(state.GetBalance(addr)))
 	assert.Equal(t, M(code, nil), M(state.GetCode(addr)))
-	assert.Equal(t, M(thor.Bytes32(crypto.Keccak256Hash(code)), nil), M(state.GetCodeHash(addr)))
+	assert.Equal(t, M(workshare.Bytes32(crypto.Keccak256Hash(code)), nil), M(state.GetCodeHash(addr)))
 
 	for k, v := range storage {
 		assert.Equal(t, M(v, nil), M(state.GetStorage(addr, k)))

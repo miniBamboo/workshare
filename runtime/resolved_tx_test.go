@@ -9,14 +9,14 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
-	"github.com/miniBamboo/workshare/builtin"
 	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/genesis"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -83,7 +83,7 @@ func (tr *testResolvedTransaction) TestResolveTransaction() {
 	_, err = runtime.ResolveTransaction(txSign(txBuild().Gas(21000 - 1)))
 	tr.assert.NotNil(err)
 
-	address := thor.BytesToAddress([]byte("addr"))
+	address := workshare.BytesToAddress([]byte("addr"))
 	_, err = runtime.ResolveTransaction(txSign(txBuild().Clause(tx.NewClause(&address).WithValue(big.NewInt(-10)).WithData(nil))))
 	tr.assert.NotNil(err)
 
@@ -118,7 +118,7 @@ func (tr *testResolvedTransaction) TestCommonTo() {
 
 	commonTo(txSign(txBuild().Clause(clause()).Clause(tx.NewClause(nil))), tr.assert.Nil)
 
-	address := thor.BytesToAddress([]byte("addr1"))
+	address := workshare.BytesToAddress([]byte("addr1"))
 	commonTo(txSign(txBuild().
 		Clause(clause()).
 		Clause(tx.NewClause(&address)),
@@ -134,9 +134,9 @@ func (tr *testResolvedTransaction) TestBuyGas() {
 		return txBuilder(tr.repo.ChainTag())
 	}
 
-	targetTime := tr.repo.BestBlockSummary().Header.Timestamp() + thor.BlockInterval
+	targetTime := tr.repo.BestBlockSummary().Header.Timestamp() + workshare.BlockInterval
 
-	buyGas := func(tx *tx.Transaction) thor.Address {
+	buyGas := func(tx *tx.Transaction) workshare.Address {
 		resolve, err := runtime.ResolveTransaction(tx)
 		if err != nil {
 			tr.t.Fatal(err)

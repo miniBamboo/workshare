@@ -25,8 +25,8 @@ import (
 	"github.com/miniBamboo/workshare/chain"
 	"github.com/miniBamboo/workshare/logdb"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/txpool"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 //New return api router
@@ -41,7 +41,7 @@ func New(
 	callGasLimit uint64,
 	pprofOn bool,
 	skipLogs bool,
-	forkConfig thor.ForkConfig,
+	forkConfig workshare.ForkConfig,
 ) (http.HandlerFunc, func()) {
 
 	origins := strings.Split(strings.TrimSpace(allowedOrigins), ",")
@@ -97,7 +97,7 @@ func New(
 	handler = handlers.CORS(
 		handlers.AllowedOrigins(origins),
 		handlers.AllowedHeaders([]string{"content-type", "x-genesis-id"}),
-		handlers.ExposedHeaders([]string{"x-genesis-id", "x-thorest-ver"}),
+		handlers.ExposedHeaders([]string{"x-genesis-id", "x-workshareest-ver"}),
 	)(handler)
 	return handler.ServeHTTP,
 		subs.Close // subscriptions handles hijacked conns, which need to be closed

@@ -25,8 +25,8 @@ import (
 	"github.com/miniBamboo/workshare/logdb"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/txpool"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	cli "gopkg.in/urfave/cli.v1"
@@ -234,7 +234,7 @@ func soloAction(ctx *cli.Context) error {
 	initLogger(ctx)
 	gene := genesis.NewDevnet()
 	// Solo forks from the start
-	forkConfig := thor.ForkConfig{}
+	forkConfig := workshare.ForkConfig{}
 
 	var mainDB *muxdb.MuxDB
 	var logDB *logdb.LogDB
@@ -331,7 +331,7 @@ func masterKeyAction(ctx *cli.Context) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("Master:", thor.Address(crypto.PubkeyToAddress(masterKey.PublicKey)))
+		fmt.Println("Master:", workshare.Address(crypto.PubkeyToAddress(masterKey.PublicKey)))
 		return nil
 	}
 
@@ -360,7 +360,7 @@ func masterKeyAction(ctx *cli.Context) error {
 		if err := crypto.SaveECDSA(keyPath, key.PrivateKey); err != nil {
 			return err
 		}
-		fmt.Println("Master key imported:", thor.Address(key.Address))
+		fmt.Println("Master key imported:", workshare.Address(key.Address))
 		return nil
 	}
 

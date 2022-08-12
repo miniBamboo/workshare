@@ -27,9 +27,9 @@ import (
 	"github.com/miniBamboo/workshare/logdb"
 	"github.com/miniBamboo/workshare/packer"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
 	"github.com/miniBamboo/workshare/txpool"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 	"github.com/syndtr/goleveldb/leveldb"
 )
@@ -70,7 +70,7 @@ func New(
 	comm *comm.Communicator,
 	targetGasLimit uint64,
 	skipLogs bool,
-	forkConfig thor.ForkConfig,
+	forkConfig workshare.ForkConfig,
 ) *Node {
 	return &Node{
 		packer:         packer.New(repo, stater, master.Address(), master.Beneficiary, forkConfig),
@@ -156,7 +156,7 @@ func (n *Node) houseKeeping(ctx context.Context) {
 	newBlockCh := make(chan *comm.NewBlockEvent)
 	scope.Track(n.comm.SubscribeBlock(newBlockCh))
 
-	futureTicker := time.NewTicker(time.Duration(thor.BlockInterval) * time.Second)
+	futureTicker := time.NewTicker(time.Duration(workshare.BlockInterval) * time.Second)
 	defer futureTicker.Stop()
 
 	connectivityTicker := time.NewTicker(time.Second)
@@ -374,7 +374,7 @@ func (n *Node) processBlock(newBlock *block.Block, stats *blockStats) (bool, err
 	return *isTrunk, nil
 }
 
-func (n *Node) writeLogs(newBlock *block.Block, newReceipts tx.Receipts, oldBestBlockID thor.Bytes32) (err error) {
+func (n *Node) writeLogs(newBlock *block.Block, newReceipts tx.Receipts, oldBestBlockID workshare.Bytes32) (err error) {
 	var w *logdb.Writer
 	if int64(newBlock.Header().Timestamp()) < time.Now().Unix()-24*3600 {
 		// turn off log sync to quickly catch up
@@ -431,7 +431,7 @@ func (n *Node) writeLogs(newBlock *block.Block, newReceipts tx.Receipts, oldBest
 	return nil
 }
 
-func (n *Node) processFork(newBlock *block.Block, oldBestBlockID thor.Bytes32) {
+func (n *Node) processFork(newBlock *block.Block, oldBestBlockID workshare.Bytes32) {
 	oldTrunk := n.repo.NewChain(oldBestBlockID)
 	newTrunk := n.repo.NewChain(newBlock.Header().ParentID())
 
@@ -471,7 +471,7 @@ func checkClockOffset() {
 		log.Debug("failed to access NTP", "err", err)
 		return
 	}
-	if resp.ClockOffset > time.Duration(thor.BlockInterval)*time.Second/2 {
+	if resp.ClockOffset > time.Duration(workshare.BlockInterval)*time.Second/2 {
 		log.Warn("clock offset detected", "offset", common.PrettyDuration(resp.ClockOffset))
 	}
 }

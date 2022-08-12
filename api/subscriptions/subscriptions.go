@@ -16,7 +16,7 @@ import (
 	"github.com/miniBamboo/workshare/api/utils"
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -270,37 +270,37 @@ func (s *Subscriptions) pipe(conn *websocket.Conn, reader msgReader) error {
 	}
 }
 
-func (s *Subscriptions) parsePosition(posStr string) (thor.Bytes32, error) {
+func (s *Subscriptions) parsePosition(posStr string) (workshare.Bytes32, error) {
 	bestID := s.repo.BestBlockSummary().Header.ID()
 	if posStr == "" {
 		return bestID, nil
 	}
-	pos, err := thor.ParseBytes32(posStr)
+	pos, err := workshare.ParseBytes32(posStr)
 	if err != nil {
-		return thor.Bytes32{}, utils.BadRequest(errors.WithMessage(err, "pos"))
+		return workshare.Bytes32{}, utils.BadRequest(errors.WithMessage(err, "pos"))
 	}
 	if block.Number(bestID)-block.Number(pos) > s.backtraceLimit {
-		return thor.Bytes32{}, utils.Forbidden(errors.New("pos: backtrace limit exceeded"))
+		return workshare.Bytes32{}, utils.Forbidden(errors.New("pos: backtrace limit exceeded"))
 	}
 	return pos, nil
 }
 
-func parseTopic(t string) (*thor.Bytes32, error) {
+func parseTopic(t string) (*workshare.Bytes32, error) {
 	if t == "" {
 		return nil, nil
 	}
-	topic, err := thor.ParseBytes32(t)
+	topic, err := workshare.ParseBytes32(t)
 	if err != nil {
 		return nil, err
 	}
 	return &topic, nil
 }
 
-func parseAddress(addr string) (*thor.Address, error) {
+func parseAddress(addr string) (*workshare.Address, error) {
 	if addr == "" {
 		return nil, nil
 	}
-	address, err := thor.ParseAddress(addr)
+	address, err := workshare.ParseAddress(addr)
 	if err != nil {
 		return nil, err
 	}

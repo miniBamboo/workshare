@@ -9,74 +9,74 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type JSONBlockSummary struct {
-	Number       uint32       `json:"number"`
-	ID           thor.Bytes32 `json:"id"`
-	Size         uint32       `json:"size"`
-	ParentID     thor.Bytes32 `json:"parentID"`
-	Timestamp    uint64       `json:"timestamp"`
-	GasLimit     uint64       `json:"gasLimit"`
-	Beneficiary  thor.Address `json:"beneficiary"`
-	GasUsed      uint64       `json:"gasUsed"`
-	TotalScore   uint64       `json:"totalScore"`
-	TxsRoot      thor.Bytes32 `json:"txsRoot"`
-	TxsFeatures  uint32       `json:"txsFeatures"`
-	StateRoot    thor.Bytes32 `json:"stateRoot"`
-	ReceiptsRoot thor.Bytes32 `json:"receiptsRoot"`
-	Signer       thor.Address `json:"signer"`
-	IsTrunk      bool         `json:"isTrunk"`
+	Number       uint32            `json:"number"`
+	ID           workshare.Bytes32 `json:"id"`
+	Size         uint32            `json:"size"`
+	ParentID     workshare.Bytes32 `json:"parentID"`
+	Timestamp    uint64            `json:"timestamp"`
+	GasLimit     uint64            `json:"gasLimit"`
+	Beneficiary  workshare.Address `json:"beneficiary"`
+	GasUsed      uint64            `json:"gasUsed"`
+	TotalScore   uint64            `json:"totalScore"`
+	TxsRoot      workshare.Bytes32 `json:"txsRoot"`
+	TxsFeatures  uint32            `json:"txsFeatures"`
+	StateRoot    workshare.Bytes32 `json:"stateRoot"`
+	ReceiptsRoot workshare.Bytes32 `json:"receiptsRoot"`
+	Signer       workshare.Address `json:"signer"`
+	IsTrunk      bool              `json:"isTrunk"`
 }
 
 type JSONCollapsedBlock struct {
 	*JSONBlockSummary
-	Transactions []thor.Bytes32 `json:"transactions"`
+	Transactions []workshare.Bytes32 `json:"transactions"`
 }
 
 type JSONClause struct {
-	To    *thor.Address        `json:"to"`
+	To    *workshare.Address   `json:"to"`
 	Value math.HexOrDecimal256 `json:"value"`
 	Data  string               `json:"data"`
 }
 
 type JSONTransfer struct {
-	Sender    thor.Address          `json:"sender"`
-	Recipient thor.Address          `json:"recipient"`
+	Sender    workshare.Address     `json:"sender"`
+	Recipient workshare.Address     `json:"recipient"`
 	Amount    *math.HexOrDecimal256 `json:"amount"`
 }
 
 type JSONEvent struct {
-	Address thor.Address   `json:"address"`
-	Topics  []thor.Bytes32 `json:"topics"`
-	Data    string         `json:"data"`
+	Address workshare.Address   `json:"address"`
+	Topics  []workshare.Bytes32 `json:"topics"`
+	Data    string              `json:"data"`
 }
 
 type JSONOutput struct {
-	ContractAddress *thor.Address   `json:"contractAddress"`
-	Events          []*JSONEvent    `json:"events"`
-	Transfers       []*JSONTransfer `json:"transfers"`
+	ContractAddress *workshare.Address `json:"contractAddress"`
+	Events          []*JSONEvent       `json:"events"`
+	Transfers       []*JSONTransfer    `json:"transfers"`
 }
 
 type JSONEmbeddedTx struct {
-	ID           thor.Bytes32        `json:"id"`
+	ID           workshare.Bytes32   `json:"id"`
 	ChainTag     byte                `json:"chainTag"`
 	BlockRef     string              `json:"blockRef"`
 	Expiration   uint32              `json:"expiration"`
 	Clauses      []*JSONClause       `json:"clauses"`
 	GasPriceCoef uint8               `json:"gasPriceCoef"`
 	Gas          uint64              `json:"gas"`
-	Origin       thor.Address        `json:"origin"`
-	Delegator    *thor.Address       `json:"delegator"`
+	Origin       workshare.Address   `json:"origin"`
+	Delegator    *workshare.Address  `json:"delegator"`
 	Nonce        math.HexOrDecimal64 `json:"nonce"`
-	DependsOn    *thor.Bytes32       `json:"dependsOn"`
+	DependsOn    *workshare.Bytes32  `json:"dependsOn"`
 	Size         uint32              `json:"size"`
 
 	// receipt part
 	GasUsed  uint64                `json:"gasUsed"`
-	GasPayer thor.Address          `json:"gasPayer"`
+	GasPayer workshare.Address     `json:"gasPayer"`
 	Paid     *math.HexOrDecimal256 `json:"paid"`
 	Reward   *math.HexOrDecimal256 `json:"reward"`
 	Reverted bool                  `json:"reverted"`
@@ -111,14 +111,14 @@ func buildJSONBlockSummary(summary *chain.BlockSummary, isTrunk bool) *JSONBlock
 	}
 }
 
-func buildJSONOutput(txID thor.Bytes32, index uint32, c *tx.Clause, o *tx.Output) *JSONOutput {
+func buildJSONOutput(txID workshare.Bytes32, index uint32, c *tx.Clause, o *tx.Output) *JSONOutput {
 	jo := &JSONOutput{
 		ContractAddress: nil,
 		Events:          make([]*JSONEvent, 0, len(o.Events)),
 		Transfers:       make([]*JSONTransfer, 0, len(o.Transfers)),
 	}
 	if c.To() == nil {
-		addr := thor.CreateContractAddress(txID, index, 0)
+		addr := workshare.CreateContractAddress(txID, index, 0)
 		jo.ContractAddress = &addr
 	}
 	for _, e := range o.Events {

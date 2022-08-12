@@ -7,7 +7,7 @@ package subscriptions
 
 import (
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type eventReader struct {
@@ -16,7 +16,7 @@ type eventReader struct {
 	blockReader chain.BlockReader
 }
 
-func newEventReader(repo *chain.Repository, position thor.Bytes32, filter *EventFilter) *eventReader {
+func newEventReader(repo *chain.Repository, position workshare.Bytes32, filter *EventFilter) *eventReader {
 	return &eventReader{
 		repo:        repo,
 		filter:      filter,

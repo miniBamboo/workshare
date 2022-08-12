@@ -13,8 +13,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/miniBamboo/workshare/api/utils"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/txpool"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -30,7 +30,7 @@ func New(repo *chain.Repository, pool *txpool.TxPool) *Transactions {
 	}
 }
 
-func (t *Transactions) getRawTransaction(txID thor.Bytes32, head thor.Bytes32, allowPending bool) (*rawTransaction, error) {
+func (t *Transactions) getRawTransaction(txID workshare.Bytes32, head workshare.Bytes32, allowPending bool) (*rawTransaction, error) {
 	chain := t.repo.NewChain(head)
 	tx, meta, err := chain.GetTransaction(txID)
 	if err != nil {
@@ -69,7 +69,7 @@ func (t *Transactions) getRawTransaction(txID thor.Bytes32, head thor.Bytes32, a
 	}, nil
 }
 
-func (t *Transactions) getTransactionByID(txID thor.Bytes32, head thor.Bytes32, allowPending bool) (*Transaction, error) {
+func (t *Transactions) getTransactionByID(txID workshare.Bytes32, head workshare.Bytes32, allowPending bool) (*Transaction, error) {
 	chain := t.repo.NewChain(head)
 	tx, meta, err := chain.GetTransaction(txID)
 	if err != nil {
@@ -92,7 +92,7 @@ func (t *Transactions) getTransactionByID(txID thor.Bytes32, head thor.Bytes32, 
 }
 
 //GetTransactionReceiptByID get tx's receipt
-func (t *Transactions) getTransactionReceiptByID(txID thor.Bytes32, head thor.Bytes32) (*Receipt, error) {
+func (t *Transactions) getTransactionReceiptByID(txID workshare.Bytes32, head workshare.Bytes32) (*Receipt, error) {
 	chain := t.repo.NewChain(head)
 	tx, meta, err := chain.GetTransaction(txID)
 	if err != nil {
@@ -140,7 +140,7 @@ func (t *Transactions) handleSendTransaction(w http.ResponseWriter, req *http.Re
 
 func (t *Transactions) handleGetTransactionByID(w http.ResponseWriter, req *http.Request) error {
 	id := mux.Vars(req)["id"]
-	txID, err := thor.ParseBytes32(id)
+	txID, err := workshare.ParseBytes32(id)
 	if err != nil {
 		return utils.BadRequest(errors.WithMessage(err, "id"))
 	}
@@ -180,7 +180,7 @@ func (t *Transactions) handleGetTransactionByID(w http.ResponseWriter, req *http
 
 func (t *Transactions) handleGetTransactionReceiptByID(w http.ResponseWriter, req *http.Request) error {
 	id := mux.Vars(req)["id"]
-	txID, err := thor.ParseBytes32(id)
+	txID, err := workshare.ParseBytes32(id)
 	if err != nil {
 		return utils.BadRequest(errors.WithMessage(err, "id"))
 	}
@@ -202,13 +202,13 @@ func (t *Transactions) handleGetTransactionReceiptByID(w http.ResponseWriter, re
 	return utils.WriteJSON(w, receipt)
 }
 
-func (t *Transactions) parseHead(head string) (thor.Bytes32, error) {
+func (t *Transactions) parseHead(head string) (workshare.Bytes32, error) {
 	if head == "" {
 		return t.repo.BestBlockSummary().Header.ID(), nil
 	}
-	h, err := thor.ParseBytes32(head)
+	h, err := workshare.ParseBytes32(head)
 	if err != nil {
-		return thor.Bytes32{}, err
+		return workshare.Bytes32{}, err
 	}
 	return h, nil
 }

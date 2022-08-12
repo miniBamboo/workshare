@@ -10,12 +10,12 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTrf(t *testing.T) {
-	var b32 thor.Bytes32
+	var b32 workshare.Bytes32
 	rand.Read(b32[:])
 
 	obj := txsRootFeatures{
@@ -30,7 +30,7 @@ func TestTrf(t *testing.T) {
 
 	assert.EqualValues(t, data2, data1)
 
-	var d thor.Bytes32
+	var d workshare.Bytes32
 	assert.Nil(t, rlp.DecodeBytes(data1, &d))
 	assert.Equal(t, b32, d)
 

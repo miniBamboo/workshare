@@ -14,7 +14,7 @@ import (
 	"github.com/miniBamboo/workshare/kv"
 	"github.com/miniBamboo/workshare/muxdb/internal/engine"
 	"github.com/miniBamboo/workshare/muxdb/internal/trie"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/syndtr/goleveldb/leveldb"
 	dberrors "github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/filter"
@@ -163,7 +163,7 @@ func (db *MuxDB) Close() error {
 //
 // If root is zero or blake2b hash of an empty string, the trie is
 // initially empty.
-func (db *MuxDB) NewTrie(name string, root thor.Bytes32, commitNum, distinctNum uint32) *Trie {
+func (db *MuxDB) NewTrie(name string, root workshare.Bytes32, commitNum, distinctNum uint32) *Trie {
 	return trie.New(
 		db.trieBackend,
 		name,
@@ -178,7 +178,7 @@ func (db *MuxDB) NewTrie(name string, root thor.Bytes32, commitNum, distinctNum 
 //
 // If root is zero or blake2b hash of an empty string, the trie is
 // initially empty.
-func (db *MuxDB) NewNonCryptoTrie(name string, root thor.Bytes32, commitNum, distinctNum uint32) *Trie {
+func (db *MuxDB) NewNonCryptoTrie(name string, root workshare.Bytes32, commitNum, distinctNum uint32) *Trie {
 	return trie.New(
 		db.trieBackend,
 		name,

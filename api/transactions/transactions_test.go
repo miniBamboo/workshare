@@ -25,9 +25,9 @@ import (
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/packer"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
 	"github.com/miniBamboo/workshare/txpool"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -129,7 +129,7 @@ func initTransactionServer(t *testing.T) {
 		t.Fatal(err)
 	}
 	repo, _ = chain.NewRepository(db, b)
-	addr := thor.BytesToAddress([]byte("to"))
+	addr := workshare.BytesToAddress([]byte("to"))
 	cla := tx.NewClause(&addr).WithValue(big.NewInt(10000))
 	transaction = new(tx.Builder).
 		ChainTag(repo.ChainTag()).
@@ -146,7 +146,7 @@ func initTransactionServer(t *testing.T) {
 		t.Fatal(err)
 	}
 	transaction = transaction.WithSignature(sig)
-	packer := packer.New(repo, stater, genesis.DevAccounts()[0].Address, &genesis.DevAccounts()[0].Address, thor.NoFork)
+	packer := packer.New(repo, stater, genesis.DevAccounts()[0].Address, &genesis.DevAccounts()[0].Address, workshare.NoFork)
 	sum, _ := repo.GetBlockSummary(b.Header().ID())
 	flow, err := packer.Schedule(sum, uint64(time.Now().Unix()))
 	if err != nil {

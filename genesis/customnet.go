@@ -13,22 +13,22 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // CustomGenesis is user customized genesis
 type CustomGenesis struct {
-	LaunchTime uint64           `json:"launchTime"`
-	GasLimit   uint64           `json:"gaslimit"`
-	ExtraData  string           `json:"extraData"`
-	Accounts   []Account        `json:"accounts"`
-	Authority  []Authority      `json:"authority"`
-	Params     Params           `json:"params"`
-	Executor   Executor         `json:"executor"`
-	ForkConfig *thor.ForkConfig `json:"forkConfig"`
+	LaunchTime     uint64                `json:"launchTime"`
+	GasLimit       uint64                `json:"gaslimit"`
+	ExtraData      string                `json:"extraData"`
+	Accounts       []Account             `json:"accounts"`
+	Auworkshareity []Auworkshareity      `json:"auworkshareity"`
+	Params         Params                `json:"params"`
+	Executor       Executor              `json:"executor"`
+	ForkConfig     *workshare.ForkConfig `json:"forkConfig"`
 }
 
 // NewCustomNet create custom network genesis.
@@ -36,9 +36,9 @@ func NewCustomNet(gen *CustomGenesis) (*Genesis, error) {
 	launchTime := gen.LaunchTime
 
 	if gen.GasLimit == 0 {
-		gen.GasLimit = thor.InitialGasLimit
+		gen.GasLimit = workshare.InitialGasLimit
 	}
-	var executor thor.Address
+	var executor workshare.Address
 	if gen.Params.ExecutorAddress != nil {
 		executor = *gen.Params.ExecutorAddress
 	} else {
@@ -51,7 +51,7 @@ func NewCustomNet(gen *CustomGenesis) (*Genesis, error) {
 		ForkConfig(*gen.ForkConfig).
 		State(func(state *state.State) error {
 			// alloc builtin contracts
-			if err := state.SetCode(builtin.Authority.Address, builtin.Authority.RuntimeBytecodes()); err != nil {
+			if err := state.SetCode(builtin.Auworkshareity.Address, builtin.Auworkshareity.RuntimeBytecodes()); err != nil {
 				return err
 			}
 			if err := state.SetCode(builtin.Energy.Address, builtin.Energy.RuntimeBytecodes()); err != nil {
@@ -108,7 +108,7 @@ func NewCustomNet(gen *CustomGenesis) (*Genesis, error) {
 				}
 				if len(a.Storage) > 0 {
 					for k, v := range a.Storage {
-						state.SetStorage(a.Address, thor.MustParseBytes32(k), v)
+						state.SetStorage(a.Address, workshare.MustParseBytes32(k), v)
 					}
 				}
 			}
@@ -125,7 +125,7 @@ func NewCustomNet(gen *CustomGenesis) (*Genesis, error) {
 			return nil, errors.New("baseGasPrice must be a non-negative integer")
 		}
 	} else {
-		bgp = thor.InitialBaseGasPrice
+		bgp = workshare.InitialBaseGasPrice
 	}
 
 	r := (*big.Int)(gen.Params.RewardRatio)
@@ -134,7 +134,7 @@ func NewCustomNet(gen *CustomGenesis) (*Genesis, error) {
 			return nil, errors.New("rewardRatio must be a non-negative integer")
 		}
 	} else {
-		r = thor.InitialRewardRatio
+		r = workshare.InitialRewardRatio
 	}
 
 	e := (*big.Int)(gen.Params.ProposerEndorsement)
@@ -143,28 +143,28 @@ func NewCustomNet(gen *CustomGenesis) (*Genesis, error) {
 			return nil, errors.New("proposerEndorsement must a non-negative integer")
 		}
 	} else {
-		e = thor.InitialProposerEndorsement
+		e = workshare.InitialProposerEndorsement
 	}
 
-	data := mustEncodeInput(builtin.Params.ABI, "set", thor.KeyExecutorAddress, new(big.Int).SetBytes(executor[:]))
-	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), thor.Address{})
+	data := mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyExecutorAddress, new(big.Int).SetBytes(executor[:]))
+	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), workshare.Address{})
 
-	data = mustEncodeInput(builtin.Params.ABI, "set", thor.KeyRewardRatio, r)
+	data = mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyRewardRatio, r)
 	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), executor)
 
-	data = mustEncodeInput(builtin.Params.ABI, "set", thor.KeyBaseGasPrice, bgp)
+	data = mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyBaseGasPrice, bgp)
 	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), executor)
 
-	data = mustEncodeInput(builtin.Params.ABI, "set", thor.KeyProposerEndorsement, e)
+	data = mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyProposerEndorsement, e)
 	builder.Call(tx.NewClause(&builtin.Params.Address).WithData(data), executor)
 
-	if len(gen.Authority) == 0 {
-		return nil, errors.New("at least one authority node")
+	if len(gen.Auworkshareity) == 0 {
+		return nil, errors.New("at least one auworkshareity node")
 	}
-	// add initial authority nodes
-	for _, anode := range gen.Authority {
-		data := mustEncodeInput(builtin.Authority.ABI, "add", anode.MasterAddress, anode.EndorsorAddress, anode.Identity)
-		builder.Call(tx.NewClause(&builtin.Authority.Address).WithData(data), executor)
+	// add initial auworkshareity nodes
+	for _, anode := range gen.Auworkshareity {
+		data := mustEncodeInput(builtin.Auworkshareity.ABI, "add", anode.MasterAddress, anode.EndorsorAddress, anode.Identity)
+		builder.Call(tx.NewClause(&builtin.Auworkshareity.Address).WithData(data), executor)
 	}
 
 	if len(gen.Executor.Approvers) > 0 {
@@ -190,18 +190,18 @@ func NewCustomNet(gen *CustomGenesis) (*Genesis, error) {
 
 // Account is the account will set to the genesis block
 type Account struct {
-	Address thor.Address            `json:"address"`
-	Balance *HexOrDecimal256        `json:"balance"`
-	Energy  *HexOrDecimal256        `json:"energy"`
-	Code    string                  `json:"code"`
-	Storage map[string]thor.Bytes32 `json:"storage"`
+	Address workshare.Address            `json:"address"`
+	Balance *HexOrDecimal256             `json:"balance"`
+	Energy  *HexOrDecimal256             `json:"energy"`
+	Code    string                       `json:"code"`
+	Storage map[string]workshare.Bytes32 `json:"storage"`
 }
 
-// Authority is the authority node info
-type Authority struct {
-	MasterAddress   thor.Address `json:"masterAddress"`
-	EndorsorAddress thor.Address `json:"endorsorAddress"`
-	Identity        thor.Bytes32 `json:"identity"`
+// Auworkshareity is the auworkshareity node info
+type Auworkshareity struct {
+	MasterAddress   workshare.Address `json:"masterAddress"`
+	EndorsorAddress workshare.Address `json:"endorsorAddress"`
+	Identity        workshare.Bytes32 `json:"identity"`
 }
 
 // Executor is the params for executor info
@@ -211,16 +211,16 @@ type Executor struct {
 
 // Approver is the approver info for executor contract
 type Approver struct {
-	Address  thor.Address `json:"address"`
-	Identity thor.Bytes32 `json:"identity"`
+	Address  workshare.Address `json:"address"`
+	Identity workshare.Bytes32 `json:"identity"`
 }
 
 // Params means the chain params for params contract
 type Params struct {
-	RewardRatio         *HexOrDecimal256 `json:"rewardRatio"`
-	BaseGasPrice        *HexOrDecimal256 `json:"baseGasPrice"`
-	ProposerEndorsement *HexOrDecimal256 `json:"proposerEndorsement"`
-	ExecutorAddress     *thor.Address    `json:"executorAddress"`
+	RewardRatio         *HexOrDecimal256   `json:"rewardRatio"`
+	BaseGasPrice        *HexOrDecimal256   `json:"baseGasPrice"`
+	ProposerEndorsement *HexOrDecimal256   `json:"proposerEndorsement"`
+	ExecutorAddress     *workshare.Address `json:"executorAddress"`
 }
 
 // hexOrDecimal256 marshals big.Int as hex or decimal.

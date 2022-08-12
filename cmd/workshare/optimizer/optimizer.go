@@ -18,8 +18,8 @@ import (
 	"github.com/miniBamboo/workshare/co"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/trie"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -71,7 +71,7 @@ func (p *Optimizer) loop(prune bool) error {
 	const (
 		period        = 2000  // the period to update leafbank.
 		prunePeriod   = 10000 // the period to prune tries.
-		pruneReserved = 70000 // must be > thor.MaxStateHistory
+		pruneReserved = 70000 // must be > workshare.MaxStateHistory
 	)
 
 	var (
@@ -143,7 +143,7 @@ func (p *Optimizer) newStorageTrieIfUpdated(accLeaf *trie.Leaf, base uint32) *mu
 	if meta.StorageCommitNum >= base {
 		return p.db.NewTrie(
 			state.StorageTrieName(meta.StorageID),
-			thor.BytesToBytes32(acc.StorageRoot),
+			workshare.BytesToBytes32(acc.StorageRoot),
 			meta.StorageCommitNum,
 			meta.StorageDistinctNum,
 		)
@@ -261,7 +261,7 @@ func (p *Optimizer) awaitUntilSteady(target uint32) (*chain.Chain, error) {
 			} else {
 				meanScore = math.Round(float64(best.Header.TotalScore()) / float64(bestNum))
 			}
-			set := make(map[thor.Address]struct{})
+			set := make(map[workshare.Address]struct{})
 			// reverse iterate the chain and collect signers.
 			for i, prev := 0, best.Header; i < int(meanScore*3) && prev.Number() >= target; i++ {
 				signer, _ := prev.Signer()

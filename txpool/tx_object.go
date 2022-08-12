@@ -14,8 +14,8 @@ import (
 	"github.com/miniBamboo/workshare/chain"
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -43,7 +43,7 @@ func resolveTx(tx *tx.Transaction, localSubmitted bool) (*txObject, error) {
 	}, nil
 }
 
-func (o *txObject) Origin() thor.Address {
+func (o *txObject) Origin() workshare.Address {
 	return o.resolved.Origin
 }
 
@@ -53,7 +53,7 @@ func (o *txObject) Executable(chain *chain.Chain, state *state.State, headBlock 
 		return false, errors.New("gas too large")
 	case o.IsExpired(headBlock.Number()):
 		return false, errors.New("expired")
-	case o.BlockRef().Number() > headBlock.Number()+uint32(5*60/thor.BlockInterval):
+	case o.BlockRef().Number() > headBlock.Number()+uint32(5*60/workshare.BlockInterval):
 		// reject deferred tx which will be applied after 5mins
 		return false, errors.New("block ref out of schedule")
 	}
@@ -86,7 +86,7 @@ func (o *txObject) Executable(chain *chain.Chain, state *state.State, headBlock 
 	// checkpoint := state.NewCheckpoint()
 	// defer state.RevertTo(checkpoint)
 
-	if _, _, _, _, err := o.resolved.BuyGas(state, headBlock.Timestamp()+thor.BlockInterval); err != nil {
+	if _, _, _, _, err := o.resolved.BuyGas(state, headBlock.Timestamp()+workshare.BlockInterval); err != nil {
 		return false, err
 	}
 	return true, nil

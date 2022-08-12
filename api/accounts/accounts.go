@@ -19,8 +19,8 @@ import (
 	"github.com/miniBamboo/workshare/chain"
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/miniBamboo/workshare/xenv"
 	"github.com/pkg/errors"
 )
@@ -29,14 +29,14 @@ type Accounts struct {
 	repo         *chain.Repository
 	stater       *state.Stater
 	callGasLimit uint64
-	forkConfig   thor.ForkConfig
+	forkConfig   workshare.ForkConfig
 }
 
 func New(
 	repo *chain.Repository,
 	stater *state.Stater,
 	callGasLimit uint64,
-	forkConfig thor.ForkConfig,
+	forkConfig workshare.ForkConfig,
 ) *Accounts {
 	return &Accounts{
 		repo,
@@ -46,7 +46,7 @@ func New(
 	}
 }
 
-func (a *Accounts) getCode(addr thor.Address, summary *chain.BlockSummary) ([]byte, error) {
+func (a *Accounts) getCode(addr workshare.Address, summary *chain.BlockSummary) ([]byte, error) {
 	code, err := a.stater.
 		NewState(summary.Header.StateRoot(), summary.Header.Number(), summary.Conflicts, summary.SteadyNum).
 		GetCode(addr)
@@ -58,7 +58,7 @@ func (a *Accounts) getCode(addr thor.Address, summary *chain.BlockSummary) ([]by
 
 func (a *Accounts) handleGetCode(w http.ResponseWriter, req *http.Request) error {
 	hexAddr := mux.Vars(req)["address"]
-	addr, err := thor.ParseAddress(hexAddr)
+	addr, err := workshare.ParseAddress(hexAddr)
 	if err != nil {
 		return utils.BadRequest(errors.WithMessage(err, "address"))
 	}
@@ -73,7 +73,7 @@ func (a *Accounts) handleGetCode(w http.ResponseWriter, req *http.Request) error
 	return utils.WriteJSON(w, map[string]string{"code": hexutil.Encode(code)})
 }
 
-func (a *Accounts) getAccount(addr thor.Address, summary *chain.BlockSummary) (*Account, error) {
+func (a *Accounts) getAccount(addr workshare.Address, summary *chain.BlockSummary) (*Account, error) {
 	state := a.stater.NewState(summary.Header.StateRoot(), summary.Header.Number(), summary.Conflicts, summary.SteadyNum)
 	b, err := state.GetBalance(addr)
 	if err != nil {
@@ -95,19 +95,19 @@ func (a *Accounts) getAccount(addr thor.Address, summary *chain.BlockSummary) (*
 	}, nil
 }
 
-func (a *Accounts) getStorage(addr thor.Address, key thor.Bytes32, summary *chain.BlockSummary) (thor.Bytes32, error) {
+func (a *Accounts) getStorage(addr workshare.Address, key workshare.Bytes32, summary *chain.BlockSummary) (workshare.Bytes32, error) {
 	storage, err := a.stater.
 		NewState(summary.Header.StateRoot(), summary.Header.Number(), summary.Conflicts, summary.SteadyNum).
 		GetStorage(addr, key)
 
 	if err != nil {
-		return thor.Bytes32{}, err
+		return workshare.Bytes32{}, err
 	}
 	return storage, nil
 }
 
 func (a *Accounts) handleGetAccount(w http.ResponseWriter, req *http.Request) error {
-	addr, err := thor.ParseAddress(mux.Vars(req)["address"])
+	addr, err := workshare.ParseAddress(mux.Vars(req)["address"])
 	if err != nil {
 		return utils.BadRequest(errors.WithMessage(err, "address"))
 	}
@@ -123,11 +123,11 @@ func (a *Accounts) handleGetAccount(w http.ResponseWriter, req *http.Request) er
 }
 
 func (a *Accounts) handleGetStorage(w http.ResponseWriter, req *http.Request) error {
-	addr, err := thor.ParseAddress(mux.Vars(req)["address"])
+	addr, err := workshare.ParseAddress(mux.Vars(req)["address"])
 	if err != nil {
 		return utils.BadRequest(errors.WithMessage(err, "address"))
 	}
-	key, err := thor.ParseBytes32(mux.Vars(req)["key"])
+	key, err := workshare.ParseBytes32(mux.Vars(req)["key"])
 	if err != nil {
 		return utils.BadRequest(errors.WithMessage(err, "key"))
 	}
@@ -151,9 +151,9 @@ func (a *Accounts) handleCallContract(w http.ResponseWriter, req *http.Request) 
 	if err != nil {
 		return err
 	}
-	var addr *thor.Address
+	var addr *workshare.Address
 	if mux.Vars(req)["address"] != "" {
-		address, err := thor.ParseAddress(mux.Vars(req)["address"])
+		address, err := workshare.ParseAddress(mux.Vars(req)["address"])
 		if err != nil {
 			return utils.BadRequest(errors.WithMessage(err, "address"))
 		}
@@ -261,12 +261,12 @@ func (a *Accounts) handleBatchCallData(batchCallData *BatchCallData) (txCtx *xen
 		txCtx.GasPrice = (*big.Int)(batchCallData.GasPrice)
 	}
 	if batchCallData.Caller == nil {
-		txCtx.Origin = thor.Address{}
+		txCtx.Origin = workshare.Address{}
 	} else {
 		txCtx.Origin = *batchCallData.Caller
 	}
 	if batchCallData.GasPayer == nil {
-		txCtx.GasPayer = thor.Address{}
+		txCtx.GasPayer = workshare.Address{}
 	} else {
 		txCtx.GasPayer = *batchCallData.GasPayer
 	}
@@ -316,7 +316,7 @@ func (a *Accounts) handleRevision(revision string) (*chain.BlockSummary, error) 
 		return a.repo.BestBlockSummary(), nil
 	}
 	if len(revision) == 66 || len(revision) == 64 {
-		blockID, err := thor.ParseBytes32(revision)
+		blockID, err := workshare.ParseBytes32(revision)
 		if err != nil {
 			return nil, utils.BadRequest(errors.WithMessage(err, "revision"))
 		}

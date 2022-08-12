@@ -11,7 +11,7 @@ import (
 	"github.com/miniBamboo/workshare/genesis"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +24,7 @@ func TestTestnetGenesis(t *testing.T) {
 
 	st := state.New(db, b0.Header().StateRoot(), 0, 0, 0)
 
-	v, err := st.Exists(thor.MustParseAddress("0xe59D475Abe695c7f67a8a2321f33A856B0B4c71d"))
+	v, err := st.Exists(workshare.MustParseAddress("0xe59D475Abe695c7f67a8a2321f33A856B0B4c71d"))
 	assert.Nil(t, err)
 	assert.True(t, v)
 }

@@ -14,8 +14,8 @@ import (
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/miniBamboo/workshare/stackedmap"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 var codeSizeCache, _ = lru.New(32 * 1024)
@@ -80,7 +80,7 @@ func (s *StateDB) GetLogs() (tx.Events, tx.Transfers) {
 
 // ForEachStorage see state.State.ForEachStorage.
 // func (s *StateDB) ForEachStorage(addr common.Address, cb func(common.Hash, common.Hash) bool) {
-// 	s.state.ForEachStorage(thor.Address(addr), func(k thor.Bytes32, v []byte) bool {
+// 	s.state.ForEachStorage(workshare.Address(addr), func(k workshare.Bytes32, v []byte) bool {
 // 		// TODO should rlp decode v
 // 		return cb(common.Hash(k), common.BytesToHash(v))
 // 	})
@@ -91,7 +91,7 @@ func (s *StateDB) CreateAccount(addr common.Address) {}
 
 // GetBalance stub.
 func (s *StateDB) GetBalance(addr common.Address) *big.Int {
-	bal, err := s.state.GetBalance(thor.Address(addr))
+	bal, err := s.state.GetBalance(workshare.Address(addr))
 	if err != nil {
 		panic(err)
 	}
@@ -103,11 +103,11 @@ func (s *StateDB) SubBalance(addr common.Address, amount *big.Int) {
 	if amount.Sign() == 0 {
 		return
 	}
-	balance, err := s.state.GetBalance(thor.Address(addr))
+	balance, err := s.state.GetBalance(workshare.Address(addr))
 	if err != nil {
 		panic(err)
 	}
-	if err := s.state.SetBalance(thor.Address(addr), new(big.Int).Sub(balance, amount)); err != nil {
+	if err := s.state.SetBalance(workshare.Address(addr), new(big.Int).Sub(balance, amount)); err != nil {
 		panic(err)
 	}
 }
@@ -117,11 +117,11 @@ func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
 	if amount.Sign() == 0 {
 		return
 	}
-	balance, err := s.state.GetBalance(thor.Address(addr))
+	balance, err := s.state.GetBalance(workshare.Address(addr))
 	if err != nil {
 		panic(err)
 	}
-	if err := s.state.SetBalance(thor.Address(addr), new(big.Int).Add(balance, amount)); err != nil {
+	if err := s.state.SetBalance(workshare.Address(addr), new(big.Int).Add(balance, amount)); err != nil {
 		panic(err)
 	}
 }
@@ -134,7 +134,7 @@ func (s *StateDB) SetNonce(addr common.Address, nonce uint64) {}
 
 // GetCodeHash stub.
 func (s *StateDB) GetCodeHash(addr common.Address) common.Hash {
-	hash, err := s.state.GetCodeHash(thor.Address(addr))
+	hash, err := s.state.GetCodeHash(workshare.Address(addr))
 	if err != nil {
 		panic(err)
 	}
@@ -143,7 +143,7 @@ func (s *StateDB) GetCodeHash(addr common.Address) common.Hash {
 
 // GetCode stub.
 func (s *StateDB) GetCode(addr common.Address) []byte {
-	code, err := s.state.GetCode(thor.Address(addr))
+	code, err := s.state.GetCode(workshare.Address(addr))
 	if err != nil {
 		panic(err)
 	}
@@ -152,7 +152,7 @@ func (s *StateDB) GetCode(addr common.Address) []byte {
 
 // GetCodeSize stub.
 func (s *StateDB) GetCodeSize(addr common.Address) int {
-	hash, err := s.state.GetCodeHash(thor.Address(addr))
+	hash, err := s.state.GetCodeHash(workshare.Address(addr))
 	if err != nil {
 		panic(err)
 	}
@@ -162,7 +162,7 @@ func (s *StateDB) GetCodeSize(addr common.Address) int {
 	if v, ok := codeSizeCache.Get(hash); ok {
 		return v.(int)
 	}
-	code, err := s.state.GetCode(thor.Address(addr))
+	code, err := s.state.GetCode(workshare.Address(addr))
 	if err != nil {
 		panic(err)
 	}
@@ -173,7 +173,7 @@ func (s *StateDB) GetCodeSize(addr common.Address) int {
 
 // SetCode stub.
 func (s *StateDB) SetCode(addr common.Address, code []byte) {
-	if err := s.state.SetCode(thor.Address(addr), code); err != nil {
+	if err := s.state.SetCode(workshare.Address(addr), code); err != nil {
 		panic(err)
 	}
 }
@@ -190,21 +190,21 @@ func (s *StateDB) HasSuicided(addr common.Address) bool {
 // 1, delete account
 // 2, set suicide flag
 func (s *StateDB) Suicide(addr common.Address) bool {
-	exist, err := s.state.Exists(thor.Address(addr))
+	exist, err := s.state.Exists(workshare.Address(addr))
 	if err != nil {
 		panic(err)
 	}
 	if !exist {
 		return false
 	}
-	s.state.Delete(thor.Address(addr))
+	s.state.Delete(workshare.Address(addr))
 	s.repo.Put(suicideFlagKey(addr), true)
 	return true
 }
 
 // GetState stub.
 func (s *StateDB) GetState(addr common.Address, key common.Hash) common.Hash {
-	val, err := s.state.GetStorage(thor.Address(addr), thor.Bytes32(key))
+	val, err := s.state.GetStorage(workshare.Address(addr), workshare.Bytes32(key))
 	if err != nil {
 		panic(err)
 	}
@@ -213,12 +213,12 @@ func (s *StateDB) GetState(addr common.Address, key common.Hash) common.Hash {
 
 // SetState stub.
 func (s *StateDB) SetState(addr common.Address, key, value common.Hash) {
-	s.state.SetStorage(thor.Address(addr), thor.Bytes32(key), thor.Bytes32(value))
+	s.state.SetStorage(workshare.Address(addr), workshare.Bytes32(key), workshare.Bytes32(value))
 }
 
 // Exist stub.
 func (s *StateDB) Exist(addr common.Address) bool {
-	b, err := s.state.Exists(thor.Address(addr))
+	b, err := s.state.Exists(workshare.Address(addr))
 	if err != nil {
 		panic(err)
 	}
@@ -269,15 +269,15 @@ func (s *StateDB) RevertToSnapshot(rev int) {
 }
 
 func ethlogToEvent(ethlog *types.Log) *tx.Event {
-	var topics []thor.Bytes32
+	var topics []workshare.Bytes32
 	if len(ethlog.Topics) > 0 {
-		topics = make([]thor.Bytes32, 0, len(ethlog.Topics))
+		topics = make([]workshare.Bytes32, 0, len(ethlog.Topics))
 		for _, t := range ethlog.Topics {
-			topics = append(topics, thor.Bytes32(t))
+			topics = append(topics, workshare.Bytes32(t))
 		}
 	}
 	return &tx.Event{
-		Address: thor.Address(ethlog.Address),
+		Address: workshare.Address(ethlog.Address),
 		Topics:  topics,
 		Data:    ethlog.Data,
 	}

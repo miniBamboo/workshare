@@ -5,7 +5,7 @@
 
 package trie
 
-import "github.com/miniBamboo/workshare/thor"
+import "github.com/miniBamboo/workshare/workshare"
 
 // ExtendedTrie is an extended Merkle Patricia Trie which supports nodes sequence number
 // and leaf metadata.
@@ -30,7 +30,7 @@ func (n Node) Dirty() bool {
 }
 
 // Hash returns the hash of the node. It returns zero hash in case of embedded or not computed.
-func (n Node) Hash() (hash thor.Bytes32) {
+func (n Node) Hash() (hash workshare.Bytes32) {
 	if n.node != nil {
 		if h, _, _ := n.node.cache(); h != nil {
 			return h.Hash
@@ -48,9 +48,9 @@ func (n Node) SeqNum() uint64 {
 }
 
 // NewExtended creates an extended trie.
-func NewExtended(root thor.Bytes32, seq uint64, db Database, nonCrypto bool) *ExtendedTrie {
+func NewExtended(root workshare.Bytes32, seq uint64, db Database, nonCrypto bool) *ExtendedTrie {
 	ext := &ExtendedTrie{trie: Trie{db: db}, nonCrypto: nonCrypto}
-	if (root != thor.Bytes32{}) && root != emptyRoot {
+	if (root != workshare.Bytes32{}) && root != emptyRoot {
 		if db == nil {
 			panic("trie.NewExtended: cannot use existing root without a database")
 		}
@@ -147,7 +147,7 @@ func (e *ExtendedTrie) Update(key, value, meta []byte) error {
 
 // Hash returns the root hash of the trie. It does not write to the
 // database and can be used even if the trie doesn't have one.
-func (e *ExtendedTrie) Hash() thor.Bytes32 {
+func (e *ExtendedTrie) Hash() workshare.Bytes32 {
 	t := &e.trie
 	return t.Hash()
 }
@@ -156,7 +156,7 @@ func (e *ExtendedTrie) Hash() thor.Bytes32 {
 //
 // Committing flushes nodes from memory.
 // Subsequent Get calls will load nodes from the database.
-func (e *ExtendedTrie) Commit(seq uint64) (root thor.Bytes32, err error) {
+func (e *ExtendedTrie) Commit(seq uint64) (root workshare.Bytes32, err error) {
 	t := &e.trie
 	if t.db == nil {
 		panic("Commit called on trie with nil database")
@@ -170,20 +170,20 @@ func (e *ExtendedTrie) Commit(seq uint64) (root thor.Bytes32, err error) {
 // load nodes from the trie's database. Calling code must ensure that
 // the changes made to db are written back to the trie's attached
 // database before using the trie.
-func (e *ExtendedTrie) CommitTo(db DatabaseWriter, seq uint64) (root thor.Bytes32, err error) {
+func (e *ExtendedTrie) CommitTo(db DatabaseWriter, seq uint64) (root workshare.Bytes32, err error) {
 	t := &e.trie
 	// ext trie always stores the root node even not changed. so here have to
 	// resolve it (since ext trie lazily resolve the root node when initializing).
 	if root, ok := t.root.(*hashNode); ok {
 		rootnode, err := t.resolveHash(root, nil)
 		if err != nil {
-			return thor.Bytes32{}, err
+			return workshare.Bytes32{}, err
 		}
 		t.root = rootnode
 	}
 	hash, cached, err := e.hashRoot(db, seq)
 	if err != nil {
-		return thor.Bytes32{}, err
+		return workshare.Bytes32{}, err
 	}
 	t.root = cached
 	t.cacheGen++

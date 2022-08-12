@@ -1,4 +1,4 @@
-// Copyright 2014 The go-ethereum Authors
+// Copyright 2014 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -45,7 +45,7 @@ func init() {
 // Used for testing
 func newEmpty() *Trie {
 	db := ethdb.NewMemDatabase()
-	trie, _ := New(thor.Bytes32{}, db)
+	trie, _ := New(workshare.Bytes32{}, db)
 	return trie
 }
 
@@ -53,7 +53,7 @@ func TestEmptyTrie(t *testing.T) {
 	var trie Trie
 	res := trie.Hash()
 	exp := emptyRoot
-	if res != thor.Bytes32(exp) {
+	if res != workshare.Bytes32(exp) {
 		t.Errorf("expected %x got %x", exp, res)
 	}
 }
@@ -70,7 +70,7 @@ func TestNull(t *testing.T) {
 
 func TestMissingRoot(t *testing.T) {
 	db := ethdb.NewMemDatabase()
-	root := thor.Bytes32{1, 2, 3, 4, 5}
+	root := workshare.Bytes32{1, 2, 3, 4, 5}
 	trie, err := New(root, db)
 	if trie != nil {
 		t.Error("New returned non-nil trie for invalid root")
@@ -82,7 +82,7 @@ func TestMissingRoot(t *testing.T) {
 
 func TestMissingNode(t *testing.T) {
 	db := ethdb.NewMemDatabase()
-	trie, _ := New(thor.Bytes32{}, db)
+	trie, _ := New(workshare.Bytes32{}, db)
 	updateString(trie, "120000", "qwerqwerqwerqwerqwerqwerqwerqwer")
 	updateString(trie, "123456", "asdfasdfasdfasdfasdfasdfasdfasdf")
 	root, _ := trie.Commit()
@@ -157,7 +157,7 @@ func TestInsert(t *testing.T) {
 	updateString(trie, "dog", "puppy")
 	updateString(trie, "dogglesworth", "cat")
 
-	exp, _ := thor.ParseBytes32("6ca394ff9b13d6690a51dea30b1b5c43108e52944d30b9095227c49bae03ff8b")
+	exp, _ := workshare.ParseBytes32("6ca394ff9b13d6690a51dea30b1b5c43108e52944d30b9095227c49bae03ff8b")
 	root := trie.Hash()
 	if root != exp {
 		t.Errorf("exp %v got %v", exp, root)
@@ -166,7 +166,7 @@ func TestInsert(t *testing.T) {
 	trie = newEmpty()
 	updateString(trie, "A", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
-	exp, _ = thor.ParseBytes32("e9d7f23f40cd82fe35f5a7a6778c3503f775f3623ba7a71fb335f0eee29dac8a")
+	exp, _ = workshare.ParseBytes32("e9d7f23f40cd82fe35f5a7a6778c3503f775f3623ba7a71fb335f0eee29dac8a")
 	root, err := trie.Commit()
 	if err != nil {
 		t.Fatalf("commit error: %v", err)
@@ -221,7 +221,7 @@ func TestDelete(t *testing.T) {
 	}
 
 	hash := trie.Hash()
-	exp, _ := thor.ParseBytes32("79a9b42da0e261b9f3ca9e78560ac8d486bcce2da8a5ddb2df8721d4c0dc2d0a")
+	exp, _ := workshare.ParseBytes32("79a9b42da0e261b9f3ca9e78560ac8d486bcce2da8a5ddb2df8721d4c0dc2d0a")
 	if hash != exp {
 		t.Errorf("expected %v got %v", exp, hash)
 	}
@@ -245,7 +245,7 @@ func TestEmptyValues(t *testing.T) {
 	}
 
 	hash := trie.Hash()
-	exp, _ := thor.ParseBytes32("79a9b42da0e261b9f3ca9e78560ac8d486bcce2da8a5ddb2df8721d4c0dc2d0a")
+	exp, _ := workshare.ParseBytes32("79a9b42da0e261b9f3ca9e78560ac8d486bcce2da8a5ddb2df8721d4c0dc2d0a")
 	if hash != exp {
 		t.Errorf("expected %v got %v", exp, hash)
 	}
@@ -410,7 +410,7 @@ func (randTest) Generate(r *rand.Rand, size int) reflect.Value {
 
 func runRandTest(rt randTest) bool {
 	db := ethdb.NewMemDatabase()
-	tr, _ := New(thor.Bytes32{}, db)
+	tr, _ := New(workshare.Bytes32{}, db)
 	values := make(map[string]string) // tracks content of the trie
 
 	for i, step := range rt {
@@ -444,7 +444,7 @@ func runRandTest(rt randTest) bool {
 			}
 			tr = newtr
 		case opItercheckhash:
-			checktr, _ := New(thor.Bytes32{}, nil)
+			checktr, _ := New(workshare.Bytes32{}, nil)
 			it := NewIterator(tr.NodeIterator(nil))
 			for it.Next() {
 				checktr.Update(it.Key, it.Value)
@@ -517,7 +517,7 @@ func benchGet(b *testing.B, commit bool) {
 	trie := new(Trie)
 	if commit {
 		_, tmpdb := tempDB()
-		trie, _ = New(thor.Bytes32{}, tmpdb)
+		trie, _ = New(workshare.Bytes32{}, tmpdb)
 	}
 	k := make([]byte, 32)
 	for i := 0; i < benchElemCount; i++ {
@@ -580,7 +580,7 @@ func BenchmarkHash(b *testing.B) {
 	// Insert the accounts into the trie and hash it
 	trie := newEmpty()
 	for i := 0; i < len(addresses); i++ {
-		trie.Update(thor.Blake2b(addresses[i][:]).Bytes(), accounts[i])
+		trie.Update(workshare.Blake2b(addresses[i][:]).Bytes(), accounts[i])
 	}
 	b.ResetTimer()
 	b.ReportAllocs()
@@ -613,7 +613,7 @@ func deleteString(trie *Trie, k string) {
 
 func TestExtended(t *testing.T) {
 	db := ethdb.NewMemDatabase()
-	tr := NewExtended(thor.Bytes32{}, 0, db, false)
+	tr := NewExtended(workshare.Bytes32{}, 0, db, false)
 
 	vals1 := []struct{ k, v string }{
 		{"do", "verb"},
@@ -643,7 +643,7 @@ func TestExtended(t *testing.T) {
 	}
 
 	for _, v := range vals1 {
-		tr.Update([]byte(v.k), []byte(v.v), thor.Blake2b([]byte(v.v)).Bytes())
+		tr.Update([]byte(v.k), []byte(v.v), workshare.Blake2b([]byte(v.v)).Bytes())
 	}
 
 	root1, err := tr.Commit(1)
@@ -652,7 +652,7 @@ func TestExtended(t *testing.T) {
 	}
 
 	for _, v := range vals2 {
-		tr.Update([]byte(v.k), []byte(v.v), thor.Blake2b([]byte(v.v)).Bytes())
+		tr.Update([]byte(v.k), []byte(v.v), workshare.Blake2b([]byte(v.v)).Bytes())
 	}
 	root2, err := tr.Commit(2)
 	if err != nil {
@@ -665,7 +665,7 @@ func TestExtended(t *testing.T) {
 		if string(val) != v.v {
 			t.Errorf("incorrect value for key '%v'", v.k)
 		}
-		if string(meta) != string(thor.Blake2b(val).Bytes()) {
+		if string(meta) != string(workshare.Blake2b(val).Bytes()) {
 			t.Errorf("incorrect value meta for key '%v'", v.k)
 		}
 	}
@@ -676,7 +676,7 @@ func TestExtended(t *testing.T) {
 		if string(val) != v.v {
 			t.Errorf("incorrect value for key '%v'", v.k)
 		}
-		if string(meta) != string(thor.Blake2b(val).Bytes()) {
+		if string(meta) != string(workshare.Blake2b(val).Bytes()) {
 			t.Errorf("incorrect value meta for key '%v'", v.k)
 		}
 	}
@@ -695,13 +695,13 @@ func (db *kedb) Encode(hash []byte, seq uint64, path []byte) []byte {
 func TestNonCryptoExtended(t *testing.T) {
 	db := &kedb{ethdb.NewMemDatabase()}
 
-	tr := NewExtended(thor.Bytes32{}, 0, db, true)
-	var root thor.Bytes32
+	tr := NewExtended(workshare.Bytes32{}, 0, db, true)
+	var root workshare.Bytes32
 	n := uint32(100)
 	for i := uint32(0); i < n; i++ {
 		var k [4]byte
 		binary.BigEndian.PutUint32(k[:], i)
-		tr.Update(k[:], thor.Blake2b(k[:]).Bytes(), nil)
+		tr.Update(k[:], workshare.Blake2b(k[:]).Bytes(), nil)
 		root, _ = tr.Commit(uint64(i))
 	}
 
@@ -711,13 +711,13 @@ func TestNonCryptoExtended(t *testing.T) {
 		binary.BigEndian.PutUint32(k[:], i)
 		val, _, err := tr.Get(k[:])
 		assert.Nil(t, err)
-		assert.Equal(t, thor.Blake2b(k[:]).Bytes(), val)
+		assert.Equal(t, workshare.Blake2b(k[:]).Bytes(), val)
 	}
 }
 
 func TestExtendedCached(t *testing.T) {
 	db := ethdb.NewMemDatabase()
-	tr := NewExtended(thor.Bytes32{}, 0, db, false)
+	tr := NewExtended(workshare.Bytes32{}, 0, db, false)
 
 	vals := []struct{ k, v string }{
 		{"do", "verb"},

@@ -10,11 +10,11 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/comm/proto"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type announcement struct {
-	newBlockID thor.Bytes32
+	newBlockID workshare.Bytes32
 	peer       *Peer
 }
 
@@ -22,7 +22,7 @@ func (c *Communicator) announcementLoop() {
 	const maxFetches = 3 // per block ID
 
 	fetchingPeers := map[discover.NodeID]bool{}
-	fetchingBlockIDs := map[thor.Bytes32]int{}
+	fetchingBlockIDs := map[workshare.Bytes32]int{}
 
 	fetchDone := make(chan *announcement)
 
@@ -58,7 +58,7 @@ func (c *Communicator) announcementLoop() {
 	}
 }
 
-func (c *Communicator) fetchBlockByID(peer *Peer, newBlockID thor.Bytes32) {
+func (c *Communicator) fetchBlockByID(peer *Peer, newBlockID workshare.Bytes32) {
 	if _, err := c.repo.GetBlockSummary(newBlockID); err != nil {
 		if !c.repo.IsNotFound(err) {
 			peer.logger.Error("failed to get block header", "err", err)

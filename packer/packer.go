@@ -7,13 +7,13 @@ package packer
 
 import (
 	"github.com/miniBamboo/workshare/block"
-	"github.com/miniBamboo/workshare/builtin"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/poa"
+	"github.com/miniBamboo/workshare/consensus/builtin"
+	"github.com/miniBamboo/workshare/consensus/poa"
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/miniBamboo/workshare/xenv"
 )
 
@@ -21,10 +21,10 @@ import (
 type Packer struct {
 	repo           *chain.Repository
 	stater         *state.Stater
-	nodeMaster     thor.Address
-	beneficiary    *thor.Address
+	nodeMaster     workshare.Address
+	beneficiary    *workshare.Address
 	targetGasLimit uint64
-	forkConfig     thor.ForkConfig
+	forkConfig     workshare.ForkConfig
 	seeder         *poa.Seeder
 }
 
@@ -33,9 +33,9 @@ type Packer struct {
 func New(
 	repo *chain.Repository,
 	stater *state.Stater,
-	nodeMaster thor.Address,
-	beneficiary *thor.Address,
-	forkConfig thor.ForkConfig) *Packer {
+	nodeMaster workshare.Address,
+	beneficiary *workshare.Address,
+	forkConfig workshare.ForkConfig) *Packer {
 
 	return &Packer{
 		repo,
@@ -57,18 +57,18 @@ func (p *Packer) Schedule(parent *chain.BlockSummary, nowTimestamp uint64) (flow
 		features |= tx.DelegationFeature
 	}
 
-	authority := builtin.Authority.Native(state)
-	endorsement, err := builtin.Params.Native(state).Get(thor.KeyProposerEndorsement)
+	auworkshareity := builtin.Auworkshareity.Native(state)
+	endorsement, err := builtin.Params.Native(state).Get(workshare.KeyProposerEndorsement)
 	if err != nil {
 		return nil, err
 	}
-	candidates, err := authority.Candidates(endorsement, thor.MaxBlockProposers)
+	candidates, err := auworkshareity.Candidates(endorsement, workshare.MaxBlockProposers)
 	if err != nil {
 		return nil, err
 	}
 	var (
 		proposers   = make([]poa.Proposer, 0, len(candidates))
-		beneficiary thor.Address
+		beneficiary workshare.Address
 	)
 	if p.beneficiary != nil {
 		beneficiary = *p.beneficiary
@@ -105,7 +105,7 @@ func (p *Packer) Schedule(parent *chain.BlockSummary, nowTimestamp uint64) (flow
 	updates, score := sched.Updates(newBlockTime)
 
 	for _, u := range updates {
-		if _, err := authority.Update(u.Address, u.Active); err != nil {
+		if _, err := auworkshareity.Update(u.Address, u.Active); err != nil {
 			return nil, err
 		}
 	}

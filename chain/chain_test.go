@@ -11,8 +11,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -55,7 +55,7 @@ func TestChain(t *testing.T) {
 	assert.Equal(t, M(tx1Meta, nil), M(c.GetTransactionMeta(tx1.ID())))
 	assert.Equal(t, M(tx1, tx1Meta, nil), M(c.GetTransaction(tx1.ID())))
 	assert.Equal(t, M(tx1Receipt, nil), M(c.GetTransactionReceipt(tx1.ID())))
-	_, err = c.GetTransactionMeta(thor.Bytes32{})
+	_, err = c.GetTransactionMeta(workshare.Bytes32{})
 	assert.True(t, c.IsNotFound(err))
 
 	assert.Equal(t, M(true, nil), M(c.HasBlock(b1.Header().ID())))
@@ -68,10 +68,10 @@ func TestChain(t *testing.T) {
 
 	c1, c2 := repo.NewChain(b3.Header().ID()), repo.NewChain(b3x.Header().ID())
 
-	assert.Equal(t, M([]thor.Bytes32{b3.Header().ID()}, nil), M(c1.Exclude(c2)))
-	assert.Equal(t, M([]thor.Bytes32{b3x.Header().ID()}, nil), M(c2.Exclude(c1)))
+	assert.Equal(t, M([]workshare.Bytes32{b3.Header().ID()}, nil), M(c1.Exclude(c2)))
+	assert.Equal(t, M([]workshare.Bytes32{b3x.Header().ID()}, nil), M(c2.Exclude(c1)))
 
-	dangleID := thor.Bytes32{0, 0, 0, 4}
+	dangleID := workshare.Bytes32{0, 0, 0, 4}
 	dangleChain := repo.NewChain(dangleID)
 
 	_, err = c1.Exclude(dangleChain)

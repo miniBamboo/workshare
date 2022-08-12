@@ -20,7 +20,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/miniBamboo/workshare/metric"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 var (
@@ -51,7 +51,7 @@ type body struct {
 	Clauses      []*Clause
 	GasPriceCoef uint8
 	Gas          uint64
-	DependsOn    *thor.Bytes32 `rlp:"nil"`
+	DependsOn    *workshare.Bytes32 `rlp:"nil"`
 	Nonce        uint64
 	Reserved     reserved
 	Signature    []byte
@@ -88,9 +88,9 @@ func (t *Transaction) IsExpired(blockNum uint32) bool {
 // ID returns id of tx.
 // ID = hash(signingHash, origin).
 // It returns zero Bytes32 if origin not available.
-func (t *Transaction) ID() (id thor.Bytes32) {
+func (t *Transaction) ID() (id workshare.Bytes32) {
 	if cached := t.cache.id.Load(); cached != nil {
-		return cached.(thor.Bytes32)
+		return cached.(workshare.Bytes32)
 	}
 	defer func() { t.cache.id.Store(id) }()
 
@@ -98,17 +98,17 @@ func (t *Transaction) ID() (id thor.Bytes32) {
 	if err != nil {
 		return
 	}
-	return thor.Blake2b(t.SigningHash().Bytes(), origin[:])
+	return workshare.Blake2b(t.SigningHash().Bytes(), origin[:])
 }
 
 // Hash returns hash of tx.
 // Unlike ID, it's the hash of RLP encoded tx.
-func (t *Transaction) Hash() (hash thor.Bytes32) {
+func (t *Transaction) Hash() (hash workshare.Bytes32) {
 	if cached := t.cache.hash.Load(); cached != nil {
-		return cached.(thor.Bytes32)
+		return cached.(workshare.Bytes32)
 	}
 	defer func() { t.cache.hash.Store(hash) }()
-	return thor.Blake2bFn(func(w io.Writer) {
+	return workshare.Blake2bFn(func(w io.Writer) {
 		rlp.Encode(w, t)
 	})
 }
@@ -131,8 +131,8 @@ func (t *Transaction) UnprovedWork() (w *big.Int) {
 }
 
 // EvaluateWork try to compute work when tx origin assumed.
-func (t *Transaction) EvaluateWork(origin thor.Address) func(nonce uint64) *big.Int {
-	hashWithoutNonce := thor.Blake2bFn(func(w io.Writer) {
+func (t *Transaction) EvaluateWork(origin workshare.Address) func(nonce uint64) *big.Int {
+	hashWithoutNonce := workshare.Blake2bFn(func(w io.Writer) {
 		rlp.Encode(w, []interface{}{
 			t.body.ChainTag,
 			t.body.BlockRef,
@@ -149,20 +149,20 @@ func (t *Transaction) EvaluateWork(origin thor.Address) func(nonce uint64) *big.
 	return func(nonce uint64) *big.Int {
 		var nonceBytes [8]byte
 		binary.BigEndian.PutUint64(nonceBytes[:], nonce)
-		hash := thor.Blake2b(hashWithoutNonce[:], nonceBytes[:])
+		hash := workshare.Blake2b(hashWithoutNonce[:], nonceBytes[:])
 		r := new(big.Int).SetBytes(hash[:])
 		return r.Div(math.MaxBig256, r)
 	}
 }
 
 // SigningHash returns hash of tx excludes signature.
-func (t *Transaction) SigningHash() (hash thor.Bytes32) {
+func (t *Transaction) SigningHash() (hash workshare.Bytes32) {
 	if cached := t.cache.signingHash.Load(); cached != nil {
-		return cached.(thor.Bytes32)
+		return cached.(workshare.Bytes32)
 	}
 	defer func() { t.cache.signingHash.Store(hash) }()
 
-	return thor.Blake2bFn(func(w io.Writer) {
+	return workshare.Blake2bFn(func(w io.Writer) {
 		rlp.Encode(w, []interface{}{
 			t.body.ChainTag,
 			t.body.BlockRef,
@@ -194,7 +194,7 @@ func (t *Transaction) Clauses() []*Clause {
 }
 
 // DependsOn returns depended tx hash.
-func (t *Transaction) DependsOn() *thor.Bytes32 {
+func (t *Transaction) DependsOn() *workshare.Bytes32 {
 	if t.body.DependsOn == nil {
 		return nil
 	}
@@ -213,32 +213,32 @@ func (t *Transaction) Features() Features {
 }
 
 // Origin extract address of tx originator from signature.
-func (t *Transaction) Origin() (thor.Address, error) {
+func (t *Transaction) Origin() (workshare.Address, error) {
 	if err := t.validateSignatureLength(); err != nil {
-		return thor.Address{}, err
+		return workshare.Address{}, err
 	}
 
 	if cached := t.cache.origin.Load(); cached != nil {
-		return cached.(thor.Address), nil
+		return cached.(workshare.Address), nil
 	}
 
 	pub, err := crypto.SigToPub(t.SigningHash().Bytes(), t.body.Signature[:65])
 	if err != nil {
-		return thor.Address{}, err
+		return workshare.Address{}, err
 	}
-	origin := thor.Address(crypto.PubkeyToAddress(*pub))
+	origin := workshare.Address(crypto.PubkeyToAddress(*pub))
 	t.cache.origin.Store(origin)
 	return origin, nil
 }
 
 // DelegatorSigningHash returns hash of tx components for delegator to sign, by assuming originator address.
 // According to VIP-191, it's identical to tx id.
-func (t *Transaction) DelegatorSigningHash(origin thor.Address) (hash thor.Bytes32) {
-	return thor.Blake2b(t.SigningHash().Bytes(), origin[:])
+func (t *Transaction) DelegatorSigningHash(origin workshare.Address) (hash workshare.Bytes32) {
+	return workshare.Blake2b(t.SigningHash().Bytes(), origin[:])
 }
 
 // Delegator returns delegator address who would like to pay for gas fee.
-func (t *Transaction) Delegator() (*thor.Address, error) {
+func (t *Transaction) Delegator() (*workshare.Address, error) {
 	if err := t.validateSignatureLength(); err != nil {
 		return nil, err
 	}
@@ -248,7 +248,7 @@ func (t *Transaction) Delegator() (*thor.Address, error) {
 	}
 
 	if cached := t.cache.delegator.Load(); cached != nil {
-		addr := cached.(thor.Address)
+		addr := cached.(workshare.Address)
 		return &addr, nil
 	}
 
@@ -262,7 +262,7 @@ func (t *Transaction) Delegator() (*thor.Address, error) {
 		return nil, err
 	}
 
-	delegator := thor.Address(crypto.PubkeyToAddress(*pub))
+	delegator := workshare.Address(crypto.PubkeyToAddress(*pub))
 
 	t.cache.delegator.Store(delegator)
 	return &delegator, nil
@@ -348,14 +348,14 @@ func (t *Transaction) GasPrice(baseGasPrice *big.Int) *big.Int {
 // ProvedWork returns proved work.
 // Unproved work will be considered as proved work if block ref is do the prefix of a block's ID,
 // and tx delay is less equal to MaxTxWorkDelay.
-func (t *Transaction) ProvedWork(headBlockNum uint32, getBlockID func(uint32) (thor.Bytes32, error)) (*big.Int, error) {
+func (t *Transaction) ProvedWork(headBlockNum uint32, getBlockID func(uint32) (workshare.Bytes32, error)) (*big.Int, error) {
 	ref := t.BlockRef()
 	refNum := ref.Number()
 	if refNum >= headBlockNum {
 		return &big.Int{}, nil
 	}
 
-	if delay := headBlockNum - refNum; delay > thor.MaxTxWorkDelay {
+	if delay := headBlockNum - refNum; delay > workshare.MaxTxWorkDelay {
 		return &big.Int{}, nil
 	}
 
@@ -444,10 +444,10 @@ func (t *Transaction) validateSignatureLength() error {
 // IntrinsicGas calculate intrinsic gas cost for tx with such clauses.
 func IntrinsicGas(clauses ...*Clause) (uint64, error) {
 	if len(clauses) == 0 {
-		return thor.TxGas + thor.ClauseGas, nil
+		return workshare.TxGas + workshare.ClauseGas, nil
 	}
 
-	var total = thor.TxGas
+	var total = workshare.TxGas
 	var overflow bool
 	for _, c := range clauses {
 		gas, err := dataGas(c.body.Data)
@@ -462,9 +462,9 @@ func IntrinsicGas(clauses ...*Clause) (uint64, error) {
 		var cgas uint64
 		if c.IsCreatingContract() {
 			// contract creation
-			cgas = thor.ClauseGasContractCreation
+			cgas = workshare.ClauseGasContractCreation
 		} else {
-			cgas = thor.ClauseGas
+			cgas = workshare.ClauseGas
 		}
 
 		total, overflow = math.SafeAdd(total, cgas)

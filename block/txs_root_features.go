@@ -9,12 +9,12 @@ import (
 	"io"
 
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type txsRootFeatures struct {
-	Root     thor.Bytes32
+	Root     workshare.Bytes32
 	Features tx.Features // supported features
 }
 
@@ -39,7 +39,7 @@ func (trf *txsRootFeatures) DecodeRLP(s *rlp.Stream) error {
 		}
 		*trf = txsRootFeatures(obj)
 	} else {
-		var root thor.Bytes32
+		var root workshare.Bytes32
 		if err := s.Decode(&root); err != nil {
 			return err
 		}

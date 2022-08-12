@@ -16,12 +16,12 @@ import (
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/inconshreveable/log15"
-	"github.com/miniBamboo/workshare/builtin"
 	"github.com/miniBamboo/workshare/chain"
 	"github.com/miniBamboo/workshare/co"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 const (
@@ -211,7 +211,7 @@ func (p *TxPool) add(newTx *tx.Transaction, rejectNonexecutable bool, localSubmi
 	}
 
 	origin, _ := newTx.Origin()
-	if thor.IsOriginBlocked(origin) || p.blocklist.Contains(origin) {
+	if workshare.IsOriginBlocked(origin) || p.blocklist.Contains(origin) {
 		// tx origin blocked
 		return nil
 	}
@@ -293,7 +293,7 @@ func (p *TxPool) AddLocal(newTx *tx.Transaction) error {
 }
 
 // Get get pooled tx by id.
-func (p *TxPool) Get(id thor.Bytes32) *tx.Transaction {
+func (p *TxPool) Get(id workshare.Bytes32) *tx.Transaction {
 	if txObj := p.all.GetByID(id); txObj != nil {
 		return txObj.Transaction
 	}
@@ -306,7 +306,7 @@ func (p *TxPool) StrictlyAdd(newTx *tx.Transaction) error {
 }
 
 // Remove removes tx from pool by its Hash.
-func (p *TxPool) Remove(txHash thor.Bytes32, txID thor.Bytes32) bool {
+func (p *TxPool) Remove(txHash workshare.Bytes32, txID workshare.Bytes32) bool {
 	if p.all.RemoveByHash(txHash) {
 		log.Debug("tx removed", "id", txID)
 		return true
@@ -327,7 +327,7 @@ func (p *TxPool) Fill(txs tx.Transactions, localSubmitted bool) {
 	txObjs := make([]*txObject, 0, len(txs))
 	for _, tx := range txs {
 		origin, _ := tx.Origin()
-		if thor.IsOriginBlocked(origin) || p.blocklist.Contains(origin) {
+		if workshare.IsOriginBlocked(origin) || p.blocklist.Contains(origin) {
 			continue
 		}
 		// here we ignore errors
@@ -370,7 +370,7 @@ func (p *TxPool) wash(headSummary *chain.BlockSummary) (executables tx.Transacti
 	newState := func() *state.State {
 		return p.stater.NewState(headSummary.Header.StateRoot(), headSummary.Header.Number(), headSummary.Conflicts, headSummary.SteadyNum)
 	}
-	baseGasPrice, err := builtin.Params.Native(newState()).Get(thor.KeyBaseGasPrice)
+	baseGasPrice, err := builtin.Params.Native(newState()).Get(workshare.KeyBaseGasPrice)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -383,7 +383,7 @@ func (p *TxPool) wash(headSummary *chain.BlockSummary) (executables tx.Transacti
 		now                 = time.Now().UnixNano()
 	)
 	for _, txObj := range all {
-		if thor.IsOriginBlocked(txObj.Origin()) || p.blocklist.Contains(txObj.Origin()) {
+		if workshare.IsOriginBlocked(txObj.Origin()) || p.blocklist.Contains(txObj.Origin()) {
 			toRemove = append(toRemove, txObj)
 			log.Debug("tx washed out", "id", txObj.ID(), "err", "blocked")
 			continue
@@ -477,5 +477,5 @@ func isChainSynced(nowTimestamp, blockTimestamp uint64) bool {
 	if blockTimestamp > nowTimestamp {
 		timeDiff = blockTimestamp - nowTimestamp
 	}
-	return timeDiff < thor.BlockInterval*6
+	return timeDiff < workshare.BlockInterval*6
 }

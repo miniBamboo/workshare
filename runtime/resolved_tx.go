@@ -9,10 +9,10 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/miniBamboo/workshare/xenv"
 	"github.com/pkg/errors"
 )
@@ -20,8 +20,8 @@ import (
 // ResolvedTransaction resolve the transaction according to given state.
 type ResolvedTransaction struct {
 	tx           *tx.Transaction
-	Origin       thor.Address
-	Delegator    *thor.Address
+	Origin       workshare.Address
+	Delegator    *workshare.Address
 	IntrinsicGas uint64
 	Clauses      []*tx.Clause
 }
@@ -69,7 +69,7 @@ func ResolveTransaction(tx *tx.Transaction) (*ResolvedTransaction, error) {
 
 // CommonTo returns common 'To' field of clauses if any.
 // Nil returned if no common 'To'.
-func (r *ResolvedTransaction) CommonTo() *thor.Address {
+func (r *ResolvedTransaction) CommonTo() *workshare.Address {
 	if len(r.Clauses) == 0 {
 		return nil
 	}
@@ -95,11 +95,11 @@ func (r *ResolvedTransaction) CommonTo() *thor.Address {
 func (r *ResolvedTransaction) BuyGas(state *state.State, blockTime uint64) (
 	baseGasPrice *big.Int,
 	gasPrice *big.Int,
-	payer thor.Address,
+	payer workshare.Address,
 	returnGas func(uint64) error,
 	err error,
 ) {
-	if baseGasPrice, err = builtin.Params.Native(state).Get(thor.KeyBaseGasPrice); err != nil {
+	if baseGasPrice, err = builtin.Params.Native(state).Get(workshare.KeyBaseGasPrice); err != nil {
 		return
 	}
 	gasPrice = r.tx.GasPrice(baseGasPrice)
@@ -125,7 +125,7 @@ func (r *ResolvedTransaction) BuyGas(state *state.State, blockTime uint64) (
 				return err
 			}, nil
 		}
-		return nil, nil, thor.Address{}, nil, errors.New("insufficient energy")
+		return nil, nil, workshare.Address{}, nil, errors.New("insufficient energy")
 	}
 
 	commonTo := r.CommonTo()
@@ -145,7 +145,7 @@ func (r *ResolvedTransaction) BuyGas(state *state.State, blockTime uint64) (
 				usedEnergy := new(big.Int).Sub(prepaid, returnedEnergy)
 				return binding.SetUserCredit(r.Origin, new(big.Int).Sub(credit, usedEnergy), blockTime)
 			}
-			var sponsor thor.Address
+			var sponsor workshare.Address
 			if sponsor, err = binding.CurrentSponsor(); err != nil {
 				return
 			}
@@ -188,15 +188,15 @@ func (r *ResolvedTransaction) BuyGas(state *state.State, blockTime uint64) (
 	if sufficient {
 		return baseGasPrice, gasPrice, r.Origin, func(rgas uint64) error { _, err := doReturnGas(rgas); return err }, nil
 	}
-	return nil, nil, thor.Address{}, nil, errors.New("insufficient energy")
+	return nil, nil, workshare.Address{}, nil, errors.New("insufficient energy")
 }
 
 // ToContext create a tx context object.
 func (r *ResolvedTransaction) ToContext(
 	gasPrice *big.Int,
-	gasPayer thor.Address,
+	gasPayer workshare.Address,
 	blockNumber uint32,
-	getBlockID func(uint32) (thor.Bytes32, error),
+	getBlockID func(uint32) (workshare.Bytes32, error),
 ) (*xenv.TransactionContext, error) {
 	provedWork, err := r.tx.ProvedWork(blockNumber, getBlockID)
 	if err != nil {

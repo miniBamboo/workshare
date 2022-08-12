@@ -21,9 +21,9 @@ import (
 	"github.com/miniBamboo/workshare/co"
 	"github.com/miniBamboo/workshare/comm/proto"
 	"github.com/miniBamboo/workshare/p2psrv/discv5"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
 	"github.com/miniBamboo/workshare/txpool"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 var log = log15.New("pkg", "comm")
@@ -75,7 +75,7 @@ func (c *Communicator) Sync(ctx context.Context, handler HandleBlockStream) {
 	shouldSynced := func() bool {
 		bestBlockTime := c.repo.BestBlockSummary().Header.Timestamp()
 		now := uint64(time.Now().Unix())
-		if bestBlockTime+thor.BlockInterval >= now {
+		if bestBlockTime+workshare.BlockInterval >= now {
 			return true
 		}
 		if syncCount > 2 {
@@ -196,7 +196,7 @@ func (c *Communicator) runPeer(peer *Peer) {
 	if localClock < remoteClock {
 		diff = remoteClock - localClock
 	}
-	if diff > thor.BlockInterval*2 {
+	if diff > workshare.BlockInterval*2 {
 		peer.logger.Debug("failed to handshake", "err", "sys time diff too large")
 		return
 	}

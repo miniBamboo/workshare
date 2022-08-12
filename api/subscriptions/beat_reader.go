@@ -10,8 +10,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
-	"github.com/miniBamboo/workshare/thor/bloom"
+	"github.com/miniBamboo/workshare/workshare"
+	"github.com/miniBamboo/workshare/workshare/bloom"
 )
 
 type beatReader struct {
@@ -19,7 +19,7 @@ type beatReader struct {
 	blockReader chain.BlockReader
 }
 
-func newBeatReader(repo *chain.Repository, position thor.Bytes32) *beatReader {
+func newBeatReader(repo *chain.Repository, position workshare.Bytes32) *beatReader {
 	return &beatReader{
 		repo:        repo,
 		blockReader: repo.NewBlockReader(position),

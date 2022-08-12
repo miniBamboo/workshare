@@ -11,15 +11,15 @@ import (
 	"sync/atomic"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // DevAccount account for development.
 type DevAccount struct {
-	Address    thor.Address
+	Address    workshare.Address
 	PrivateKey *ecdsa.PrivateKey
 }
 
@@ -50,7 +50,7 @@ func DevAccounts() []DevAccount {
 			panic(err)
 		}
 		addr := crypto.PubkeyToAddress(pk.PublicKey)
-		accs = append(accs, DevAccount{thor.Address(addr), pk})
+		accs = append(accs, DevAccount{workshare.Address(addr), pk})
 	}
 	devAccounts.Store(accs)
 	return accs
@@ -64,12 +64,12 @@ func NewDevnet() *Genesis {
 	soloBlockSigner := DevAccounts()[0]
 
 	builder := new(Builder).
-		GasLimit(thor.InitialGasLimit).
+		GasLimit(workshare.InitialGasLimit).
 		Timestamp(launchTime).
 		State(func(state *state.State) error {
 
 			// setup builtin contracts
-			if err := state.SetCode(builtin.Authority.Address, builtin.Authority.RuntimeBytecodes()); err != nil {
+			if err := state.SetCode(builtin.Auworkshareity.Address, builtin.Auworkshareity.RuntimeBytecodes()); err != nil {
 				return err
 			}
 			if err := state.SetCode(builtin.Energy.Address, builtin.Energy.RuntimeBytecodes()); err != nil {
@@ -101,19 +101,19 @@ func NewDevnet() *Genesis {
 			return builtin.Energy.Native(state, launchTime).SetInitialSupply(tokenSupply, energySupply)
 		}).
 		Call(
-			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", thor.KeyExecutorAddress, new(big.Int).SetBytes(executor[:]))),
-			thor.Address{}).
+			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyExecutorAddress, new(big.Int).SetBytes(executor[:]))),
+			workshare.Address{}).
 		Call(
-			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", thor.KeyRewardRatio, thor.InitialRewardRatio)),
+			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyRewardRatio, workshare.InitialRewardRatio)),
 			executor).
 		Call(
-			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", thor.KeyBaseGasPrice, thor.InitialBaseGasPrice)),
+			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyBaseGasPrice, workshare.InitialBaseGasPrice)),
 			executor).
 		Call(
-			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", thor.KeyProposerEndorsement, thor.InitialProposerEndorsement)),
+			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyProposerEndorsement, workshare.InitialProposerEndorsement)),
 			executor).
 		Call(
-			tx.NewClause(&builtin.Authority.Address).WithData(mustEncodeInput(builtin.Authority.ABI, "add", soloBlockSigner.Address, soloBlockSigner.Address, thor.BytesToBytes32([]byte("Solo Block Signer")))),
+			tx.NewClause(&builtin.Auworkshareity.Address).WithData(mustEncodeInput(builtin.Auworkshareity.ABI, "add", soloBlockSigner.Address, soloBlockSigner.Address, workshare.BytesToBytes32([]byte("Solo Block Signer")))),
 			executor)
 
 	id, err := builder.ComputeID()

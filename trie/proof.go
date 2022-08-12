@@ -1,4 +1,4 @@
-// Copyright 2015 The go-ethereum Authors
+// Copyright 2015 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // Prove constructs a merkle proof for key. The result contains all
@@ -83,7 +83,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb DatabaseWriter) error {
 				if ok {
 					proofDb.Put(hash.Hash[:], hasher.tmp)
 				} else {
-					proofDb.Put(thor.Blake2b(hasher.tmp).Bytes(), hasher.tmp)
+					proofDb.Put(workshare.Blake2b(hasher.tmp).Bytes(), hasher.tmp)
 				}
 			}
 		}
@@ -95,7 +95,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb DatabaseWriter) error {
 // value for key in a trie with the given root hash. VerifyProof
 // returns an error if the proof contains invalid trie nodes or the
 // wrong value.
-func VerifyProof(rootHash thor.Bytes32, key []byte, proofDb DatabaseReader) (value []byte, err error, nodes int) {
+func VerifyProof(rootHash workshare.Bytes32, key []byte, proofDb DatabaseReader) (value []byte, err error, nodes int) {
 	key = keybytesToHex(key)
 	wantHash := rootHash
 	for i := 0; ; i++ {

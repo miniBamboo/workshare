@@ -1,4 +1,4 @@
-// Copyright 2014 The go-ethereum Authors
+// Copyright 2014 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,7 +33,7 @@ import (
 func makeTestTrie() (ethdb.Database, *Trie, map[string][]byte) {
 	// Create an empty trie
 	db := ethdb.NewMemDatabase()
-	trie, _ := New(thor.Bytes32{}, db)
+	trie, _ := New(workshare.Bytes32{}, db)
 
 	// Fill it with some arbitrary data
 	content := make(map[string][]byte)
@@ -135,9 +135,9 @@ func TestNodeIteratorCoverage(t *testing.T) {
 	db, trie, _ := makeTestTrie()
 
 	// Gather all the node hashes found by the iterator
-	hashes := make(map[thor.Bytes32]struct{})
+	hashes := make(map[workshare.Bytes32]struct{})
 	for it := trie.NodeIterator(nil); it.Next(true); {
-		if it.Hash() != (thor.Bytes32{}) {
+		if it.Hash() != (workshare.Bytes32{}) {
 			hashes[it.Hash()] = struct{}{}
 		}
 	}
@@ -148,7 +148,7 @@ func TestNodeIteratorCoverage(t *testing.T) {
 		}
 	}
 	for _, key := range db.(*ethdb.MemDatabase).Keys() {
-		if _, ok := hashes[thor.BytesToBytes32(key)]; !ok {
+		if _, ok := hashes[workshare.BytesToBytes32(key)]; !ok {
 			t.Errorf("state entry not reported %x", key)
 		}
 	}
@@ -314,7 +314,7 @@ func TestIteratorNoDups(t *testing.T) {
 // This test checks that nodeIterator.Next can be retried after inserting missing trie nodes.
 func TestIteratorContinueAfterError(t *testing.T) {
 	db := ethdb.NewMemDatabase()
-	tr, _ := New(thor.Bytes32{}, db)
+	tr, _ := New(workshare.Bytes32{}, db)
 	for _, val := range testdata1 {
 		tr.Update([]byte(val.k), []byte(val.v))
 	}
@@ -365,7 +365,7 @@ func TestIteratorContinueAfterError(t *testing.T) {
 func TestIteratorContinueAfterSeekError(t *testing.T) {
 	// Commit test trie to db, then remove the node containing "bars".
 	db := ethdb.NewMemDatabase()
-	ctr, _ := New(thor.Bytes32{}, db)
+	ctr, _ := New(workshare.Bytes32{}, db)
 	for _, val := range testdata1 {
 		ctr.Update([]byte(val.k), []byte(val.v))
 	}
@@ -409,7 +409,7 @@ func checkIteratorNoDups(t *testing.T, it NodeIterator, seen map[string]bool) in
 
 func TestIteratorNodeFilter(t *testing.T) {
 	db := ethdb.NewMemDatabase()
-	tr := NewExtended(thor.Bytes32{}, 0, db, false)
+	tr := NewExtended(workshare.Bytes32{}, 0, db, false)
 	for _, val := range testdata1 {
 		tr.Update([]byte(val.k), []byte(val.v), nil)
 	}

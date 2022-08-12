@@ -27,8 +27,8 @@ import (
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/packer"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -82,12 +82,12 @@ var abiJSON = `[
 		"type": "function"
 	}
 ]`
-var addr = thor.BytesToAddress([]byte("to"))
+var addr = workshare.BytesToAddress([]byte("to"))
 var value = big.NewInt(10000)
-var storageKey = thor.Bytes32{}
+var storageKey = workshare.Bytes32{}
 var storageValue = byte(1)
 
-var contractAddr thor.Address
+var contractAddr workshare.Address
 
 var bytecode = common.Hex2Bytes("608060405234801561001057600080fd5b50610125806100206000396000f3006080604052600436106049576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806324b8ba5f14604e578063bb4e3f4d14607b575b600080fd5b348015605957600080fd5b506079600480360381019080803560ff16906020019092919050505060cf565b005b348015608657600080fd5b5060b3600480360381019080803560ff169060200190929190803560ff16906020019092919050505060ec565b604051808260ff1660ff16815260200191505060405180910390f35b806000806101000a81548160ff021916908360ff16021790555050565b60008183019050929150505600a165627a7a723058201584add23e31d36c569b468097fe01033525686b59bbb263fb3ab82e9553dae50029")
 
@@ -165,11 +165,11 @@ func getStorage(t *testing.T) {
 	if err := json.Unmarshal(res, &value); err != nil {
 		t.Fatal(err)
 	}
-	h, err := thor.ParseBytes32(value["value"])
+	h, err := workshare.ParseBytes32(value["value"])
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, thor.BytesToBytes32([]byte{storageValue}), h, "storage should be equal")
+	assert.Equal(t, workshare.BytesToBytes32([]byte{storageValue}), h, "storage should be equal")
 	assert.Equal(t, http.StatusOK, statusCode, "OK")
 }
 
@@ -186,7 +186,7 @@ func initAccountServer(t *testing.T) {
 	claTransfer := tx.NewClause(&addr).WithValue(value)
 	claDeploy := tx.NewClause(nil).WithData(bytecode)
 	transaction := buildTxWithClauses(t, repo.ChainTag(), claTransfer, claDeploy)
-	contractAddr = thor.CreateContractAddress(transaction.ID(), 1, 0)
+	contractAddr = workshare.CreateContractAddress(transaction.ID(), 1, 0)
 	packTx(repo, stater, transaction, t)
 
 	method := "set"
@@ -201,7 +201,7 @@ func initAccountServer(t *testing.T) {
 	packTx(repo, stater, transactionCall, t)
 
 	router := mux.NewRouter()
-	accounts.New(repo, stater, math.MaxUint64, thor.NoFork).Mount(router, "/accounts")
+	accounts.New(repo, stater, math.MaxUint64, workshare.NoFork).Mount(router, "/accounts")
 	ts = httptest.NewServer(router)
 }
 
@@ -223,7 +223,7 @@ func buildTxWithClauses(t *testing.T, chaiTag byte, clauses ...*tx.Clause) *tx.T
 }
 
 func packTx(repo *chain.Repository, stater *state.Stater, transaction *tx.Transaction, t *testing.T) {
-	packer := packer.New(repo, stater, genesis.DevAccounts()[0].Address, &genesis.DevAccounts()[0].Address, thor.NoFork)
+	packer := packer.New(repo, stater, genesis.DevAccounts()[0].Address, &genesis.DevAccounts()[0].Address, workshare.NoFork)
 	flow, err := packer.Schedule(repo.BestBlockSummary(), uint64(time.Now().Unix()))
 	err = flow.Adopt(transaction)
 	if err != nil {

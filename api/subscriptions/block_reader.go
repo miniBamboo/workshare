@@ -7,7 +7,7 @@ package subscriptions
 
 import (
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type blockReader struct {
@@ -15,7 +15,7 @@ type blockReader struct {
 	blockReader chain.BlockReader
 }
 
-func newBlockReader(repo *chain.Repository, position thor.Bytes32) *blockReader {
+func newBlockReader(repo *chain.Repository, position workshare.Bytes32) *blockReader {
 	return &blockReader{
 		repo:        repo,
 		blockReader: repo.NewBlockReader(position),

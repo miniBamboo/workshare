@@ -10,8 +10,8 @@ import (
 	"container/list"
 
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
@@ -47,7 +47,7 @@ func (ts *txStash) Save(tx *tx.Transaction) error {
 	}
 	ts.fifo.PushBack(tx.Hash())
 	for ts.fifo.Len() > ts.maxSize {
-		keyToDelete := ts.fifo.Remove(ts.fifo.Front()).(thor.Bytes32).Bytes()
+		keyToDelete := ts.fifo.Remove(ts.fifo.Front()).(workshare.Bytes32).Bytes()
 		if err := ts.db.Delete(keyToDelete, nil); err != nil {
 			return err
 		}

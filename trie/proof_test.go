@@ -1,4 +1,4 @@
-// Copyright 2015 The go-ethereum Authors
+// Copyright 2015 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 func init() {
@@ -83,7 +83,7 @@ func TestVerifyBadProof(t *testing.T) {
 		node, _ := proofs.Get(key)
 		proofs.Delete(key)
 		mutateByte(node)
-		proofs.Put(thor.Blake2b(node).Bytes(), node)
+		proofs.Put(workshare.Blake2b(node).Bytes(), node)
 		if _, err, _ := VerifyProof(root, kv.k, proofs); err == nil {
 			t.Fatalf("expected proof to fail for key %x", kv.k)
 		}

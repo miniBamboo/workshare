@@ -11,8 +11,8 @@ import (
 
 	"github.com/inconshreveable/log15"
 	"github.com/miniBamboo/workshare/kv"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/trie"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -56,7 +56,7 @@ type Trie struct {
 func New(
 	back *Backend,
 	name string,
-	root thor.Bytes32,
+	root workshare.Bytes32,
 	commitNum uint32,
 	distinctNum uint32,
 	nonCrypto bool,
@@ -269,7 +269,7 @@ func (t *Trie) Update(key, val, meta []byte) error {
 }
 
 // Stage processes trie updates and calculates the new root hash.
-func (t *Trie) Stage(newCommitNum, newDistinctNum uint32) (root thor.Bytes32, commit func() error) {
+func (t *Trie) Stage(newCommitNum, newDistinctNum uint32) (root workshare.Bytes32, commit func() error) {
 	var (
 		thisPath []byte
 		bulk     = t.back.Store.Bulk()

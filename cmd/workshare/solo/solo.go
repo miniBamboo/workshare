@@ -21,9 +21,9 @@ import (
 	"github.com/miniBamboo/workshare/logdb"
 	"github.com/miniBamboo/workshare/packer"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
 	"github.com/miniBamboo/workshare/txpool"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -50,7 +50,7 @@ func New(
 	gasLimit uint64,
 	onDemand bool,
 	skipLogs bool,
-	forkConfig thor.ForkConfig,
+	forkConfig workshare.ForkConfig,
 ) *Solo {
 	return &Solo{
 		repo:   repo,
@@ -93,7 +93,7 @@ func (s *Solo) loop(ctx context.Context) {
 			log.Info("stopping interval packing service......")
 			return
 		case <-time.After(time.Duration(1) * time.Second):
-			if left := uint64(time.Now().Unix()) % thor.BlockInterval; left == 0 {
+			if left := uint64(time.Now().Unix()) % workshare.BlockInterval; left == 0 {
 				if err := s.packing(s.txPool.Executables(), false); err != nil {
 					log.Error("failed to pack block", "err", err)
 				}

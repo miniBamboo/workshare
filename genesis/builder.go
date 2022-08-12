@@ -12,8 +12,8 @@ import (
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/miniBamboo/workshare/xenv"
 	"github.com/pkg/errors"
 )
@@ -27,12 +27,12 @@ type Builder struct {
 	calls      []call
 	extraData  [28]byte
 
-	forkConfig thor.ForkConfig
+	forkConfig workshare.ForkConfig
 }
 
 type call struct {
 	clause *tx.Clause
-	caller thor.Address
+	caller workshare.Address
 }
 
 // Timestamp set timestamp.
@@ -54,7 +54,7 @@ func (b *Builder) State(proc func(state *state.State) error) *Builder {
 }
 
 // Call add a contract call.
-func (b *Builder) Call(clause *tx.Clause, caller thor.Address) *Builder {
+func (b *Builder) Call(clause *tx.Clause, caller workshare.Address) *Builder {
 	b.calls = append(b.calls, call{clause, caller})
 	return b
 }
@@ -66,25 +66,25 @@ func (b *Builder) ExtraData(data [28]byte) *Builder {
 }
 
 // ForkConfig set fork config.
-func (b *Builder) ForkConfig(fc thor.ForkConfig) *Builder {
+func (b *Builder) ForkConfig(fc workshare.ForkConfig) *Builder {
 	b.forkConfig = fc
 	return b
 }
 
 // ComputeID compute genesis ID.
-func (b *Builder) ComputeID() (thor.Bytes32, error) {
+func (b *Builder) ComputeID() (workshare.Bytes32, error) {
 	db := muxdb.NewMem()
 
 	blk, _, _, err := b.Build(state.NewStater(db))
 	if err != nil {
-		return thor.Bytes32{}, err
+		return workshare.Bytes32{}, err
 	}
 	return blk.Header().ID(), nil
 }
 
 // Build build genesis block according to presets.
 func (b *Builder) Build(stater *state.Stater) (blk *block.Block, events tx.Events, transfers tx.Transfers, err error) {
-	state := stater.NewState(thor.Bytes32{}, 0, 0, 0)
+	state := stater.NewState(workshare.Bytes32{}, 0, 0, 0)
 
 	for _, proc := range b.stateProcs {
 		if err := proc(state); err != nil {
@@ -121,7 +121,7 @@ func (b *Builder) Build(stater *state.Stater) (blk *block.Block, events tx.Event
 		return nil, nil, nil, errors.Wrap(err, "commit state")
 	}
 
-	parentID := thor.Bytes32{0xff, 0xff, 0xff, 0xff} //so, genesis number is 0
+	parentID := workshare.Bytes32{0xff, 0xff, 0xff, 0xff} //so, genesis number is 0
 	copy(parentID[4:], b.extraData[:])
 
 	return new(block.Builder).

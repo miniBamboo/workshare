@@ -9,20 +9,20 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 //Event represents tx.Event that can be stored in db.
 type Event struct {
 	BlockNumber uint32
 	Index       uint32
-	BlockID     thor.Bytes32
+	BlockID     workshare.Bytes32
 	BlockTime   uint64
-	TxID        thor.Bytes32
-	TxOrigin    thor.Address //contract caller
+	TxID        workshare.Bytes32
+	TxOrigin    workshare.Address //contract caller
 	ClauseIndex uint32
-	Address     thor.Address // always a contract address
-	Topics      [5]*thor.Bytes32
+	Address     workshare.Address // always a contract address
+	Topics      [5]*workshare.Bytes32
 	Data        []byte
 }
 
@@ -30,13 +30,13 @@ type Event struct {
 type Transfer struct {
 	BlockNumber uint32
 	Index       uint32
-	BlockID     thor.Bytes32
+	BlockID     workshare.Bytes32
 	BlockTime   uint64
-	TxID        thor.Bytes32
-	TxOrigin    thor.Address
+	TxID        workshare.Bytes32
+	TxOrigin    workshare.Address
 	ClauseIndex uint32
-	Sender      thor.Address
-	Recipient   thor.Address
+	Sender      workshare.Address
+	Recipient   workshare.Address
 	Amount      *big.Int
 }
 
@@ -58,8 +58,8 @@ type Options struct {
 }
 
 type EventCriteria struct {
-	Address *thor.Address // always a contract address
-	Topics  [5]*thor.Bytes32
+	Address *workshare.Address // always a contract address
+	Topics  [5]*workshare.Bytes32
 }
 
 func (c *EventCriteria) toWhereCondition() (cond string, args []interface{}) {
@@ -86,9 +86,9 @@ type EventFilter struct {
 }
 
 type TransferCriteria struct {
-	TxOrigin  *thor.Address //who send transaction
-	Sender    *thor.Address //who transferred tokens
-	Recipient *thor.Address //who recieved tokens
+	TxOrigin  *workshare.Address //who send transaction
+	Sender    *workshare.Address //who transferred tokens
+	Recipient *workshare.Address //who recieved tokens
 }
 
 func (c *TransferCriteria) toWhereCondition() (cond string, args []interface{}) {

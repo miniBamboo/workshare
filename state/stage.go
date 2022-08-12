@@ -5,21 +5,21 @@
 
 package state
 
-import "github.com/miniBamboo/workshare/thor"
+import "github.com/miniBamboo/workshare/workshare"
 
 // Stage abstracts changes on the main accounts trie.
 type Stage struct {
-	root    thor.Bytes32
+	root    workshare.Bytes32
 	commits []func() error
 }
 
 // Hash computes hash of the main accounts trie.
-func (s *Stage) Hash() thor.Bytes32 {
+func (s *Stage) Hash() workshare.Bytes32 {
 	return s.root
 }
 
 // Commit commits all changes into main accounts trie and storage tries.
-func (s *Stage) Commit() (root thor.Bytes32, err error) {
+func (s *Stage) Commit() (root workshare.Bytes32, err error) {
 	for _, c := range s.commits {
 		if err = c(); err != nil {
 			err = &Error{err}

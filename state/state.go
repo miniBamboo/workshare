@@ -15,7 +15,7 @@ import (
 	"github.com/miniBamboo/workshare/lowrlp"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/stackedmap"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 const (
@@ -47,18 +47,18 @@ func (e *Error) Error() string {
 // State manages the world state.
 type State struct {
 	db             *muxdb.MuxDB
-	trie           *muxdb.Trie                    // the accounts trie reader
-	cache          map[thor.Address]*cachedObject // cache of accounts trie
-	sm             *stackedmap.StackedMap         // keeps revisions of accounts state
+	trie           *muxdb.Trie                         // the accounts trie reader
+	cache          map[workshare.Address]*cachedObject // cache of accounts trie
+	sm             *stackedmap.StackedMap              // keeps revisions of accounts state
 	steadyBlockNum uint32
 }
 
 // New create state object.
-func New(db *muxdb.MuxDB, root thor.Bytes32, blockNum, blockConflicts, steadyBlockNum uint32) *State {
+func New(db *muxdb.MuxDB, root workshare.Bytes32, blockNum, blockConflicts, steadyBlockNum uint32) *State {
 	state := State{
 		db:             db,
 		trie:           db.NewTrie(AccountTrieName, root, blockNum, blockConflicts),
-		cache:          make(map[thor.Address]*cachedObject),
+		cache:          make(map[workshare.Address]*cachedObject),
 		steadyBlockNum: steadyBlockNum,
 	}
 
@@ -69,21 +69,21 @@ func New(db *muxdb.MuxDB, root thor.Bytes32, blockNum, blockConflicts, steadyBlo
 }
 
 // Checkout checkouts to another state.
-func (s *State) Checkout(root thor.Bytes32, blockNum, blockConflicts, steadyBlockNum uint32) *State {
+func (s *State) Checkout(root workshare.Bytes32, blockNum, blockConflicts, steadyBlockNum uint32) *State {
 	return New(s.db, root, blockNum, blockConflicts, steadyBlockNum)
 }
 
 // cacheGetter implements stackedmap.MapGetter.
 func (s *State) cacheGetter(key interface{}) (value interface{}, exist bool, err error) {
 	switch k := key.(type) {
-	case thor.Address: // get account
+	case workshare.Address: // get account
 		obj, err := s.getCachedObject(k)
 		if err != nil {
 			return nil, false, err
 		}
 		return &obj.data, true, nil
 	case codeKey: // get code
-		obj, err := s.getCachedObject(thor.Address(k))
+		obj, err := s.getCachedObject(workshare.Address(k))
 		if err != nil {
 			return nil, false, err
 		}
@@ -114,7 +114,7 @@ func (s *State) cacheGetter(key interface{}) (value interface{}, exist bool, err
 	panic(fmt.Errorf("unexpected key type %+v", key))
 }
 
-func (s *State) getCachedObject(addr thor.Address) (*cachedObject, error) {
+func (s *State) getCachedObject(addr workshare.Address) (*cachedObject, error) {
 	if co, ok := s.cache[addr]; ok {
 		return co, nil
 	}
@@ -128,7 +128,7 @@ func (s *State) getCachedObject(addr thor.Address) (*cachedObject, error) {
 }
 
 // getAccount gets account by address. the returned account should not be modified.
-func (s *State) getAccount(addr thor.Address) (*Account, error) {
+func (s *State) getAccount(addr workshare.Address) (*Account, error) {
 	v, _, err := s.sm.Get(addr)
 	if err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ func (s *State) getAccount(addr thor.Address) (*Account, error) {
 }
 
 // getAccountCopy get a copy of account by address.
-func (s *State) getAccountCopy(addr thor.Address) (Account, error) {
+func (s *State) getAccountCopy(addr workshare.Address) (Account, error) {
 	acc, err := s.getAccount(addr)
 	if err != nil {
 		return Account{}, err
@@ -145,21 +145,21 @@ func (s *State) getAccountCopy(addr thor.Address) (Account, error) {
 	return *acc, nil
 }
 
-func (s *State) updateAccount(addr thor.Address, acc *Account) {
+func (s *State) updateAccount(addr workshare.Address, acc *Account) {
 	s.sm.Put(addr, acc)
 }
 
-func (s *State) getStorageBarrier(addr thor.Address) int {
+func (s *State) getStorageBarrier(addr workshare.Address) int {
 	b, _, _ := s.sm.Get(storageBarrierKey(addr))
 	return b.(int)
 }
 
-func (s *State) setStorageBarrier(addr thor.Address, barrier int) {
+func (s *State) setStorageBarrier(addr workshare.Address, barrier int) {
 	s.sm.Put(storageBarrierKey(addr), barrier)
 }
 
 // GetBalance returns balance for the given address.
-func (s *State) GetBalance(addr thor.Address) (*big.Int, error) {
+func (s *State) GetBalance(addr workshare.Address) (*big.Int, error) {
 	acc, err := s.getAccount(addr)
 	if err != nil {
 		return nil, &Error{err}
@@ -168,7 +168,7 @@ func (s *State) GetBalance(addr thor.Address) (*big.Int, error) {
 }
 
 // SetBalance set balance for the given address.
-func (s *State) SetBalance(addr thor.Address, balance *big.Int) error {
+func (s *State) SetBalance(addr workshare.Address, balance *big.Int) error {
 	cpy, err := s.getAccountCopy(addr)
 	if err != nil {
 		return &Error{err}
@@ -179,7 +179,7 @@ func (s *State) SetBalance(addr thor.Address, balance *big.Int) error {
 }
 
 // GetEnergy get energy for the given address at block number specified.
-func (s *State) GetEnergy(addr thor.Address, blockTime uint64) (*big.Int, error) {
+func (s *State) GetEnergy(addr workshare.Address, blockTime uint64) (*big.Int, error) {
 	acc, err := s.getAccount(addr)
 	if err != nil {
 		return nil, &Error{err}
@@ -188,7 +188,7 @@ func (s *State) GetEnergy(addr thor.Address, blockTime uint64) (*big.Int, error)
 }
 
 // SetEnergy set energy at block number for the given address.
-func (s *State) SetEnergy(addr thor.Address, energy *big.Int, blockTime uint64) error {
+func (s *State) SetEnergy(addr workshare.Address, energy *big.Int, blockTime uint64) error {
 	cpy, err := s.getAccountCopy(addr)
 	if err != nil {
 		return &Error{err}
@@ -200,16 +200,16 @@ func (s *State) SetEnergy(addr thor.Address, energy *big.Int, blockTime uint64) 
 
 // GetMaster get master for the given address.
 // Master can move energy, manage users...
-func (s *State) GetMaster(addr thor.Address) (thor.Address, error) {
+func (s *State) GetMaster(addr workshare.Address) (workshare.Address, error) {
 	acc, err := s.getAccount(addr)
 	if err != nil {
-		return thor.Address{}, &Error{err}
+		return workshare.Address{}, &Error{err}
 	}
-	return thor.BytesToAddress(acc.Master), nil
+	return workshare.BytesToAddress(acc.Master), nil
 }
 
 // SetMaster set master for the given address.
-func (s *State) SetMaster(addr thor.Address, master thor.Address) error {
+func (s *State) SetMaster(addr workshare.Address, master workshare.Address) error {
 	cpy, err := s.getAccountCopy(addr)
 	if err != nil {
 		return &Error{err}
@@ -224,28 +224,28 @@ func (s *State) SetMaster(addr thor.Address, master thor.Address) error {
 }
 
 // GetStorage returns storage value for the given address and key.
-func (s *State) GetStorage(addr thor.Address, key thor.Bytes32) (thor.Bytes32, error) {
+func (s *State) GetStorage(addr workshare.Address, key workshare.Bytes32) (workshare.Bytes32, error) {
 	raw, err := s.GetRawStorage(addr, key)
 	if err != nil {
-		return thor.Bytes32{}, &Error{err}
+		return workshare.Bytes32{}, &Error{err}
 	}
 	if len(raw) == 0 {
-		return thor.Bytes32{}, nil
+		return workshare.Bytes32{}, nil
 	}
 	kind, content, _, err := rlp.Split(raw)
 	if err != nil {
-		return thor.Bytes32{}, &Error{err}
+		return workshare.Bytes32{}, &Error{err}
 	}
 	if kind == rlp.List {
 		// special case for rlp list, it should be customized storage value
 		// return hash of raw data
-		return thor.Blake2b(raw), nil
+		return workshare.Blake2b(raw), nil
 	}
-	return thor.BytesToBytes32(content), nil
+	return workshare.BytesToBytes32(content), nil
 }
 
 // SetStorage set storage value for the given address and key.
-func (s *State) SetStorage(addr thor.Address, key, value thor.Bytes32) {
+func (s *State) SetStorage(addr workshare.Address, key, value workshare.Bytes32) {
 	if value.IsZero() {
 		s.SetRawStorage(addr, key, nil)
 		return
@@ -255,7 +255,7 @@ func (s *State) SetStorage(addr thor.Address, key, value thor.Bytes32) {
 }
 
 // GetRawStorage returns storage value in rlp raw for given address and key.
-func (s *State) GetRawStorage(addr thor.Address, key thor.Bytes32) (rlp.RawValue, error) {
+func (s *State) GetRawStorage(addr workshare.Address, key workshare.Bytes32) (rlp.RawValue, error) {
 	data, _, err := s.sm.Get(storageKey{addr, s.getStorageBarrier(addr), key})
 	if err != nil {
 		return nil, &Error{err}
@@ -264,13 +264,13 @@ func (s *State) GetRawStorage(addr thor.Address, key thor.Bytes32) (rlp.RawValue
 }
 
 // SetRawStorage set storage value in rlp raw.
-func (s *State) SetRawStorage(addr thor.Address, key thor.Bytes32, raw rlp.RawValue) {
+func (s *State) SetRawStorage(addr workshare.Address, key workshare.Bytes32, raw rlp.RawValue) {
 	s.sm.Put(storageKey{addr, s.getStorageBarrier(addr), key}, raw)
 }
 
 // EncodeStorage set storage value encoded by given enc method.
 // Error returned by end will be absorbed by State instance.
-func (s *State) EncodeStorage(addr thor.Address, key thor.Bytes32, enc func() ([]byte, error)) error {
+func (s *State) EncodeStorage(addr workshare.Address, key workshare.Bytes32, enc func() ([]byte, error)) error {
 	raw, err := enc()
 	if err != nil {
 		return &Error{err}
@@ -281,7 +281,7 @@ func (s *State) EncodeStorage(addr thor.Address, key thor.Bytes32, enc func() ([
 
 // DecodeStorage get and decode storage value.
 // Error returned by dec will be absorbed by State instance.
-func (s *State) DecodeStorage(addr thor.Address, key thor.Bytes32, dec func([]byte) error) error {
+func (s *State) DecodeStorage(addr workshare.Address, key workshare.Bytes32, dec func([]byte) error) error {
 	raw, err := s.GetRawStorage(addr, key)
 	if err != nil {
 		return &Error{err}
@@ -293,7 +293,7 @@ func (s *State) DecodeStorage(addr thor.Address, key thor.Bytes32, dec func([]by
 }
 
 // GetCode returns code for the given address.
-func (s *State) GetCode(addr thor.Address) ([]byte, error) {
+func (s *State) GetCode(addr workshare.Address) ([]byte, error) {
 	v, _, err := s.sm.Get(codeKey(addr))
 	if err != nil {
 		return nil, &Error{err}
@@ -302,16 +302,16 @@ func (s *State) GetCode(addr thor.Address) ([]byte, error) {
 }
 
 // GetCodeHash returns code hash for the given address.
-func (s *State) GetCodeHash(addr thor.Address) (thor.Bytes32, error) {
+func (s *State) GetCodeHash(addr workshare.Address) (workshare.Bytes32, error) {
 	acc, err := s.getAccount(addr)
 	if err != nil {
-		return thor.Bytes32{}, &Error{err}
+		return workshare.Bytes32{}, &Error{err}
 	}
-	return thor.BytesToBytes32(acc.CodeHash), nil
+	return workshare.BytesToBytes32(acc.CodeHash), nil
 }
 
 // SetCode set code for the given address.
-func (s *State) SetCode(addr thor.Address, code []byte) error {
+func (s *State) SetCode(addr workshare.Address, code []byte) error {
 	var codeHash []byte
 	if len(code) > 0 {
 		s.sm.Put(codeKey(addr), code)
@@ -331,7 +331,7 @@ func (s *State) SetCode(addr thor.Address, code []byte) error {
 
 // Exists returns whether an account exists at the given address.
 // See Account.IsEmpty()
-func (s *State) Exists(addr thor.Address) (bool, error) {
+func (s *State) Exists(addr workshare.Address) (bool, error) {
 	acc, err := s.getAccount(addr)
 	if err != nil {
 		return false, &Error{err}
@@ -341,7 +341,7 @@ func (s *State) Exists(addr thor.Address) (bool, error) {
 
 // Delete delete an account at the given address.
 // That's set balance, energy and code to zero value.
-func (s *State) Delete(addr thor.Address) {
+func (s *State) Delete(addr workshare.Address) {
 	s.sm.Put(codeKey(addr), []byte(nil))
 	s.updateAccount(addr, emptyAccount())
 	// increase the barrier value
@@ -360,7 +360,7 @@ func (s *State) RevertTo(revision int) {
 }
 
 // BuildStorageTrie build up storage trie for given address with cumulative changes.
-func (s *State) BuildStorageTrie(addr thor.Address) (trie *muxdb.Trie, err error) {
+func (s *State) BuildStorageTrie(addr workshare.Address) (trie *muxdb.Trie, err error) {
 	acc, err := s.getAccount(addr)
 	if err != nil {
 		return nil, &Error{err}
@@ -373,13 +373,13 @@ func (s *State) BuildStorageTrie(addr thor.Address) (trie *muxdb.Trie, err error
 		}
 		trie = s.db.NewTrie(
 			StorageTrieName(obj.meta.StorageID),
-			thor.BytesToBytes32(acc.StorageRoot),
+			workshare.BytesToBytes32(acc.StorageRoot),
 			obj.meta.StorageCommitNum,
 			obj.meta.StorageDistinctNum)
 	} else {
 		trie = s.db.NewTrie(
 			"",
-			thor.Bytes32{},
+			workshare.Bytes32{},
 			0,
 			0,
 		)
@@ -411,19 +411,19 @@ func (s *State) Stage(newBlockNum, newBlockConflicts uint32) (*Stage, error) {
 	type changed struct {
 		data            Account
 		meta            AccountMetadata
-		storage         map[thor.Bytes32]rlp.RawValue
+		storage         map[workshare.Bytes32]rlp.RawValue
 		baseStorageTrie *muxdb.Trie
 	}
 
 	var (
-		changes = make(map[thor.Address]*changed)
-		codes   = make(map[thor.Bytes32][]byte)
+		changes = make(map[workshare.Address]*changed)
+		codes   = make(map[workshare.Bytes32][]byte)
 
 		storageTrieCreationCount uint64
 	)
 
 	// get or create changed account
-	getChanged := func(addr thor.Address) (*changed, error) {
+	getChanged := func(addr workshare.Address) (*changed, error) {
 		if obj, ok := changes[addr]; ok {
 			return obj, nil
 		}
@@ -442,7 +442,7 @@ func (s *State) Stage(newBlockNum, newBlockConflicts uint32) (*Stage, error) {
 	s.sm.Journal(func(k, v interface{}) bool {
 		var c *changed
 		switch key := k.(type) {
-		case thor.Address:
+		case workshare.Address:
 			if c, jerr = getChanged(key); jerr != nil {
 				return false
 			}
@@ -450,14 +450,14 @@ func (s *State) Stage(newBlockNum, newBlockConflicts uint32) (*Stage, error) {
 		case codeKey:
 			code := v.([]byte)
 			if len(code) > 0 {
-				codes[thor.Bytes32(crypto.Keccak256Hash(code))] = code
+				codes[workshare.Bytes32(crypto.Keccak256Hash(code))] = code
 			}
 		case storageKey:
 			if c, jerr = getChanged(key.addr); jerr != nil {
 				return false
 			}
 			if c.storage == nil {
-				c.storage = make(map[thor.Bytes32]rlp.RawValue)
+				c.storage = make(map[workshare.Bytes32]rlp.RawValue)
 			}
 			c.storage[key.key] = v.(rlp.RawValue)
 			if len(c.meta.StorageID) == 0 {
@@ -470,7 +470,7 @@ func (s *State) Stage(newBlockNum, newBlockConflicts uint32) (*Stage, error) {
 				c.meta.StorageID = enc.ToBytes()
 			}
 		case storageBarrierKey:
-			if c, jerr = getChanged(thor.Address(key)); jerr != nil {
+			if c, jerr = getChanged(workshare.Address(key)); jerr != nil {
 				return false
 			}
 			// discard all storage updates and base storage trie when meet the barrier.
@@ -497,7 +497,7 @@ func (s *State) Stage(newBlockNum, newBlockConflicts uint32) (*Stage, error) {
 				} else {
 					sTrie = s.db.NewTrie(
 						StorageTrieName(c.meta.StorageID),
-						thor.BytesToBytes32(c.data.StorageRoot),
+						workshare.BytesToBytes32(c.data.StorageRoot),
 						c.meta.StorageCommitNum,
 						c.meta.StorageDistinctNum)
 				}
@@ -540,10 +540,10 @@ func (s *State) Stage(newBlockNum, newBlockConflicts uint32) (*Stage, error) {
 
 type (
 	storageKey struct {
-		addr    thor.Address
+		addr    workshare.Address
 		barrier int
-		key     thor.Bytes32
+		key     workshare.Bytes32
 	}
-	codeKey           thor.Address
-	storageBarrierKey thor.Address
+	codeKey           workshare.Address
+	storageBarrierKey workshare.Address
 )

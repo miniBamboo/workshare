@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/miniBamboo/workshare/block"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // Bandwidth is gas per second.
@@ -36,7 +36,7 @@ func (b *Bandwidth) Update(header *block.Header, elapsed time.Duration) (uint64,
 	gasLimit := header.GasLimit()
 	gasUsed := header.GasUsed()
 	// ignore low gas used
-	if gasUsed < gasLimit/10 && gasUsed < thor.MinGasLimit {
+	if gasUsed < gasLimit/10 && gasUsed < workshare.MinGasLimit {
 		return b.value, false
 	}
 
@@ -57,5 +57,5 @@ func (b *Bandwidth) SuggestGasLimit() uint64 {
 	defer b.lock.Unlock()
 
 	// use float64 to avoid overflow
-	return uint64(float64(b.value) * float64(thor.TolerableBlockPackingTime) / float64(time.Second))
+	return uint64(float64(b.value) * float64(workshare.TolerableBlockPackingTime) / float64(time.Second))
 }

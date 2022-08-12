@@ -7,12 +7,12 @@ package abi
 
 import (
 	ethabi "github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // Event see abi.Event in go-ethereum.
 type Event struct {
-	id                 thor.Bytes32
+	id                 workshare.Bytes32
 	event              *ethabi.Event
 	argsWithoutIndexed ethabi.Arguments
 }
@@ -25,14 +25,14 @@ func newEvent(event *ethabi.Event) *Event {
 		}
 	}
 	return &Event{
-		thor.Bytes32(event.Id()),
+		workshare.Bytes32(event.Id()),
 		event,
 		argsWithoutIndexed,
 	}
 }
 
 // ID returns event id.
-func (e *Event) ID() thor.Bytes32 {
+func (e *Event) ID() workshare.Bytes32 {
 	return e.id
 }
 

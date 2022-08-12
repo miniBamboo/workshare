@@ -9,27 +9,27 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // txObjectMap to maintain mapping of tx hash to tx object, and account quota.
 type txObjectMap struct {
 	lock      sync.RWMutex
-	mapByHash map[thor.Bytes32]*txObject
-	mapByID   map[thor.Bytes32]*txObject
-	quota     map[thor.Address]int
+	mapByHash map[workshare.Bytes32]*txObject
+	mapByID   map[workshare.Bytes32]*txObject
+	quota     map[workshare.Address]int
 }
 
 func newTxObjectMap() *txObjectMap {
 	return &txObjectMap{
-		mapByHash: make(map[thor.Bytes32]*txObject),
-		mapByID:   make(map[thor.Bytes32]*txObject),
-		quota:     make(map[thor.Address]int),
+		mapByHash: make(map[workshare.Bytes32]*txObject),
+		mapByID:   make(map[workshare.Bytes32]*txObject),
+		quota:     make(map[workshare.Address]int),
 	}
 }
 
-func (m *txObjectMap) ContainsHash(txHash thor.Bytes32) bool {
+func (m *txObjectMap) ContainsHash(txHash workshare.Bytes32) bool {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	_, found := m.mapByHash[txHash]
@@ -55,13 +55,13 @@ func (m *txObjectMap) Add(txObj *txObject, limitPerAccount int) error {
 	return nil
 }
 
-func (m *txObjectMap) GetByID(id thor.Bytes32) *txObject {
+func (m *txObjectMap) GetByID(id workshare.Bytes32) *txObject {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	return m.mapByID[id]
 }
 
-func (m *txObjectMap) RemoveByHash(txHash thor.Bytes32) bool {
+func (m *txObjectMap) RemoveByHash(txHash workshare.Bytes32) bool {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 

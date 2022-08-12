@@ -8,10 +8,10 @@ package genesis
 import (
 	"math/big"
 
-	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/consensus/builtin"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // NewTestnet create genesis for testnet.
@@ -19,21 +19,21 @@ func NewTestnet() *Genesis {
 	launchTime := uint64(1530014400) // 'Tue Jun 26 2018 20:00:00 GMT+0800 (CST)'
 
 	// use this address as executor instead of builtin one, for test purpose
-	executor := thor.MustParseAddress("0xB5A34b62b63A6f1EE99DFD30b133B657859f8d79")
-	acccount0 := thor.MustParseAddress("0xe59D475Abe695c7f67a8a2321f33A856B0B4c71d")
+	executor := workshare.MustParseAddress("0xB5A34b62b63A6f1EE99DFD30b133B657859f8d79")
+	acccount0 := workshare.MustParseAddress("0xe59D475Abe695c7f67a8a2321f33A856B0B4c71d")
 
-	master0 := thor.MustParseAddress("0x25AE0ef84dA4a76D5a1DFE80D3789C2c46FeE30a")
-	endorser0 := thor.MustParseAddress("0xb4094c25f86d628fdD571Afc4077f0d0196afB48")
+	master0 := workshare.MustParseAddress("0x25AE0ef84dA4a76D5a1DFE80D3789C2c46FeE30a")
+	endorser0 := workshare.MustParseAddress("0xb4094c25f86d628fdD571Afc4077f0d0196afB48")
 
 	builder := new(Builder).
 		Timestamp(launchTime).
-		GasLimit(thor.InitialGasLimit).
-		ForkConfig(thor.NoFork).
+		GasLimit(workshare.InitialGasLimit).
+		ForkConfig(workshare.NoFork).
 		State(func(state *state.State) error {
 			tokenSupply := new(big.Int)
 
 			// setup builtin contracts
-			if err := state.SetCode(builtin.Authority.Address, builtin.Authority.RuntimeBytecodes()); err != nil {
+			if err := state.SetCode(builtin.Auworkshareity.Address, builtin.Auworkshareity.RuntimeBytecodes()); err != nil {
 				return err
 			}
 			if err := state.SetCode(builtin.Energy.Address, builtin.Energy.RuntimeBytecodes()); err != nil {
@@ -74,19 +74,19 @@ func NewTestnet() *Genesis {
 		// set initial params
 		// use an external account as executor to manage testnet easily
 		Call(
-			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", thor.KeyExecutorAddress, new(big.Int).SetBytes(executor[:]))),
-			thor.Address{}).
+			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyExecutorAddress, new(big.Int).SetBytes(executor[:]))),
+			workshare.Address{}).
 		Call(
-			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", thor.KeyRewardRatio, thor.InitialRewardRatio)),
+			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyRewardRatio, workshare.InitialRewardRatio)),
 			executor).
 		Call(
-			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", thor.KeyBaseGasPrice, thor.InitialBaseGasPrice)),
+			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyBaseGasPrice, workshare.InitialBaseGasPrice)),
 			executor).
 		Call(
-			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", thor.KeyProposerEndorsement, thor.InitialProposerEndorsement)),
+			tx.NewClause(&builtin.Params.Address).WithData(mustEncodeInput(builtin.Params.ABI, "set", workshare.KeyProposerEndorsement, workshare.InitialProposerEndorsement)),
 			executor).
 		// add master0 as the initial block proposer
-		Call(tx.NewClause(&builtin.Authority.Address).WithData(mustEncodeInput(builtin.Authority.ABI, "add", master0, endorser0, thor.BytesToBytes32([]byte("master0")))),
+		Call(tx.NewClause(&builtin.Auworkshareity.Address).WithData(mustEncodeInput(builtin.Auworkshareity.ABI, "add", master0, endorser0, workshare.BytesToBytes32([]byte("master0")))),
 			executor)
 
 	id, err := builder.ComputeID()

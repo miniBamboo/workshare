@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 func TestHeader_BetterThan(t *testing.T) {
@@ -30,8 +30,8 @@ func TestHeader_BetterThan(t *testing.T) {
 		largerID  fields
 		smallerID fields
 	)
-	largerID.cache.id.Store(thor.Bytes32{1})
-	smallerID.cache.id.Store(thor.Bytes32{0})
+	largerID.cache.id.Store(workshare.Bytes32{1})
+	smallerID.cache.id.Store(workshare.Bytes32{0})
 
 	tests := []struct {
 		name   string

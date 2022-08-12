@@ -13,8 +13,8 @@ import (
 	"github.com/miniBamboo/workshare/co"
 	"github.com/miniBamboo/workshare/kv"
 	"github.com/miniBamboo/workshare/muxdb"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
@@ -90,7 +90,7 @@ func NewRepository(db *muxdb.MuxDB, genesis *block.Block) (*Repository, error) {
 			return nil, err
 		}
 	} else {
-		bestID := thor.BytesToBytes32(val)
+		bestID := workshare.BytesToBytes32(val)
 		existingGenesisID, err := repo.NewChain(bestID).GetBlockID(0)
 		if err != nil {
 			return nil, errors.Wrap(err, "get existing genesis id")
@@ -112,7 +112,7 @@ func NewRepository(db *muxdb.MuxDB, genesis *block.Block) (*Repository, error) {
 		}
 		repo.steadyID.Store(genesis.Header().ID())
 	} else {
-		repo.steadyID.Store(thor.BytesToBytes32(val))
+		repo.steadyID.Store(workshare.BytesToBytes32(val))
 	}
 	return repo, nil
 }
@@ -133,7 +133,7 @@ func (r *Repository) BestBlockSummary() *BlockSummary {
 }
 
 // SetBestBlockID set the given block id as best block id.
-func (r *Repository) SetBestBlockID(id thor.Bytes32) (err error) {
+func (r *Repository) SetBestBlockID(id workshare.Bytes32) (err error) {
 	defer func() {
 		if err == nil {
 			r.tick.Broadcast()
@@ -155,13 +155,13 @@ func (r *Repository) setBestBlockSummary(summary *BlockSummary) error {
 }
 
 // SteadyBlockID return the head block id of the steady chain.
-func (r *Repository) SteadyBlockID() thor.Bytes32 {
-	return r.steadyID.Load().(thor.Bytes32)
+func (r *Repository) SteadyBlockID() workshare.Bytes32 {
+	return r.steadyID.Load().(workshare.Bytes32)
 }
 
 // SetSteadyBlockID set the given block id as the head block id of the steady chain.
-func (r *Repository) SetSteadyBlockID(id thor.Bytes32) error {
-	prev := r.steadyID.Load().(thor.Bytes32)
+func (r *Repository) SetSteadyBlockID(id workshare.Bytes32) error {
+	prev := r.steadyID.Load().(workshare.Bytes32)
 
 	if has, err := r.NewChain(id).HasBlock(prev); err != nil {
 		return err
@@ -181,7 +181,7 @@ func (r *Repository) saveBlock(block *block.Block, receipts tx.Receipts, conflic
 		header      = block.Header()
 		id          = header.ID()
 		txs         = block.Transactions()
-		summary     = BlockSummary{header, []thor.Bytes32{}, uint64(block.Size()), conflicts, steadyNum}
+		summary     = BlockSummary{header, []workshare.Bytes32{}, uint64(block.Size()), conflicts, steadyNum}
 		bulk        = r.db.NewStore("").Bulk()
 		indexPutter = kv.Bucket(txIndexStoreName).NewPutter(bulk)
 		dataPutter  = kv.Bucket(dataStoreName).NewPutter(bulk)
@@ -247,7 +247,7 @@ func (r *Repository) AddBlock(newBlock *block.Block, receipts tx.Receipts, confl
 		return err
 	}
 	steadyNum := parentSummary.SteadyNum // initially inherits parent's steady num.
-	newSteadyID := r.steadyID.Load().(thor.Bytes32)
+	newSteadyID := r.steadyID.Load().(workshare.Bytes32)
 	if newSteadyNum := block.Number(newSteadyID); steadyNum != newSteadyNum {
 		if has, err := r.NewChain(parentSummary.Header.ID()).HasBlock(newSteadyID); err != nil {
 			return err
@@ -292,7 +292,7 @@ func (r *Repository) GetMaxBlockNum() (uint32, error) {
 }
 
 // GetBlockSummary get block summary by block id.
-func (r *Repository) GetBlockSummary(id thor.Bytes32) (summary *BlockSummary, err error) {
+func (r *Repository) GetBlockSummary(id workshare.Bytes32) (summary *BlockSummary, err error) {
 	var cached interface{}
 	if cached, err = r.caches.summaries.GetOrLoad(id, func() (interface{}, error) {
 		return loadBlockSummary(r.data, id)
@@ -313,7 +313,7 @@ func (r *Repository) getTransaction(key txKey) (*tx.Transaction, error) {
 }
 
 // GetBlockTransactions get all transactions of the block for given block id.
-func (r *Repository) GetBlockTransactions(id thor.Bytes32) (tx.Transactions, error) {
+func (r *Repository) GetBlockTransactions(id workshare.Bytes32) (tx.Transactions, error) {
 	summary, err := r.GetBlockSummary(id)
 	if err != nil {
 		return nil, err
@@ -335,7 +335,7 @@ func (r *Repository) GetBlockTransactions(id thor.Bytes32) (tx.Transactions, err
 }
 
 // GetBlock get block by id.
-func (r *Repository) GetBlock(id thor.Bytes32) (*block.Block, error) {
+func (r *Repository) GetBlock(id workshare.Bytes32) (*block.Block, error) {
 	summary, err := r.GetBlockSummary(id)
 	if err != nil {
 		return nil, err
@@ -358,7 +358,7 @@ func (r *Repository) getReceipt(key txKey) (*tx.Receipt, error) {
 }
 
 // GetBlockReceipts get all tx receipts of the block for given block id.
-func (r *Repository) GetBlockReceipts(id thor.Bytes32) (tx.Receipts, error) {
+func (r *Repository) GetBlockReceipts(id workshare.Bytes32) (tx.Receipts, error) {
 	summary, err := r.GetBlockSummary(id)
 	if err != nil {
 		return nil, err

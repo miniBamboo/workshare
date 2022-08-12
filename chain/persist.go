@@ -11,8 +11,8 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/kv"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 const (
@@ -23,7 +23,7 @@ const (
 // BlockSummary presents block summary.
 type BlockSummary struct {
 	Header    *block.Header
-	Txs       []thor.Bytes32
+	Txs       []workshare.Bytes32
 	Size      uint64
 	Conflicts uint32
 	SteadyNum uint32
@@ -33,7 +33,7 @@ type BlockSummary struct {
 // it consists of: ( block id | infix | index )
 type txKey [32 + 1 + 8]byte
 
-func makeTxKey(blockID thor.Bytes32, infix byte) (k txKey) {
+func makeTxKey(blockID workshare.Bytes32, infix byte) (k txKey) {
 	copy(k[:], blockID[:])
 	k[32] = infix
 	return
@@ -63,7 +63,7 @@ func saveBlockSummary(w kv.Putter, summary *BlockSummary) error {
 	return saveRLP(w, summary.Header.ID().Bytes(), summary)
 }
 
-func loadBlockSummary(r kv.Getter, id thor.Bytes32) (*BlockSummary, error) {
+func loadBlockSummary(r kv.Getter, id workshare.Bytes32) (*BlockSummary, error) {
 	var summary BlockSummary
 	if err := loadRLP(r, id[:], &summary); err != nil {
 		return nil, err

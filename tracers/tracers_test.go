@@ -1,4 +1,4 @@
-// Copyright 2017 The go-ethereum Authors
+// Copyright 2017 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -32,11 +32,11 @@ import (
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tracers"
 	"github.com/miniBamboo/workshare/tracers/logger"
 	"github.com/miniBamboo/workshare/tx"
 	"github.com/miniBamboo/workshare/vm"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/miniBamboo/workshare/xenv"
 	"github.com/stretchr/testify/assert"
 
@@ -46,8 +46,8 @@ import (
 
 type callFrame struct {
 	Type    string                `json:"type"`
-	From    thor.Address          `json:"from"`
-	To      thor.Address          `json:"to,omitempty"`
+	From    workshare.Address     `json:"from"`
+	To      workshare.Address     `json:"to,omitempty"`
 	Value   *math.HexOrDecimal256 `json:"value,omitempty"`
 	Gas     math.HexOrDecimal64   `json:"gas"`
 	GasUsed math.HexOrDecimal64   `json:"gasUsed"`
@@ -58,23 +58,23 @@ type callFrame struct {
 }
 
 type clause struct {
-	To    *thor.Address         `json:"to,omitempty"`
+	To    *workshare.Address    `json:"to,omitempty"`
 	Value *math.HexOrDecimal256 `json:"value"`
 	Data  hexutil.Bytes         `json:"data"`
 }
 
 type account struct {
-	Balance *math.HexOrDecimal256        `json:"balance"`
-	Code    hexutil.Bytes                `json:"code"`
-	Nonce   uint64                       `json:"nonce"`
-	Storage map[common.Hash]thor.Bytes32 `json:"storage"`
+	Balance *math.HexOrDecimal256             `json:"balance"`
+	Code    hexutil.Bytes                     `json:"code"`
+	Nonce   uint64                            `json:"nonce"`
+	Storage map[common.Hash]workshare.Bytes32 `json:"storage"`
 }
 
 type context struct {
-	BlockNumber uint32       `json:"blockNumber"`
-	TxOrigin    thor.Address `json:"txOrigin"`
-	ClauseIndex uint32       `json:"clauseIndex"`
-	TxID        thor.Bytes32 `json:"txID"`
+	BlockNumber uint32            `json:"blockNumber"`
+	TxOrigin    workshare.Address `json:"txOrigin"`
+	ClauseIndex uint32            `json:"clauseIndex"`
+	TxID        workshare.Bytes32 `json:"txID"`
 }
 
 type traceTest struct {
@@ -99,18 +99,18 @@ func RunTracerTest(t *testing.T, data *traceTest, tracerName string) json.RawMes
 	chain := repo.NewChain(gene.Header().ID())
 
 	for addr, account := range data.State {
-		st.SetBalance(thor.Address(addr), (*big.Int)(account.Balance))
+		st.SetBalance(workshare.Address(addr), (*big.Int)(account.Balance))
 		if len(account.Code) > 0 {
-			st.SetCode(thor.Address(addr), account.Code)
+			st.SetCode(workshare.Address(addr), account.Code)
 		}
 		for k, v := range account.Storage {
-			st.SetStorage(thor.Address(addr), thor.Bytes32(k), v)
+			st.SetStorage(workshare.Address(addr), workshare.Bytes32(k), v)
 		}
 	}
 
 	rt := runtime.New(chain, st, &xenv.BlockContext{
 		Number: data.Context.BlockNumber,
-	}, thor.GetForkConfig(gene.Header().ID()))
+	}, workshare.GetForkConfig(gene.Header().ID()))
 
 	var tr tracers.Tracer
 	if len(tracerName) > 0 {

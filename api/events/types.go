@@ -13,32 +13,32 @@ import (
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/chain"
 	"github.com/miniBamboo/workshare/logdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type LogMeta struct {
-	BlockID        thor.Bytes32 `json:"blockID"`
-	BlockNumber    uint32       `json:"blockNumber"`
-	BlockTimestamp uint64       `json:"blockTimestamp"`
-	TxID           thor.Bytes32 `json:"txID"`
-	TxOrigin       thor.Address `json:"txOrigin"`
-	ClauseIndex    uint32       `json:"clauseIndex"`
+	BlockID        workshare.Bytes32 `json:"blockID"`
+	BlockNumber    uint32            `json:"blockNumber"`
+	BlockTimestamp uint64            `json:"blockTimestamp"`
+	TxID           workshare.Bytes32 `json:"txID"`
+	TxOrigin       workshare.Address `json:"txOrigin"`
+	ClauseIndex    uint32            `json:"clauseIndex"`
 }
 
 type TopicSet struct {
-	Topic0 *thor.Bytes32 `json:"topic0"`
-	Topic1 *thor.Bytes32 `json:"topic1"`
-	Topic2 *thor.Bytes32 `json:"topic2"`
-	Topic3 *thor.Bytes32 `json:"topic3"`
-	Topic4 *thor.Bytes32 `json:"topic4"`
+	Topic0 *workshare.Bytes32 `json:"topic0"`
+	Topic1 *workshare.Bytes32 `json:"topic1"`
+	Topic2 *workshare.Bytes32 `json:"topic2"`
+	Topic3 *workshare.Bytes32 `json:"topic3"`
+	Topic4 *workshare.Bytes32 `json:"topic4"`
 }
 
 // FilteredEvent only comes from one contract
 type FilteredEvent struct {
-	Address thor.Address    `json:"address"`
-	Topics  []*thor.Bytes32 `json:"topics"`
-	Data    string          `json:"data"`
-	Meta    LogMeta         `json:"meta"`
+	Address workshare.Address    `json:"address"`
+	Topics  []*workshare.Bytes32 `json:"topics"`
+	Data    string               `json:"data"`
+	Meta    LogMeta              `json:"meta"`
 }
 
 //convert a logdb.Event into a json format Event
@@ -55,7 +55,7 @@ func convertEvent(event *logdb.Event) *FilteredEvent {
 			ClauseIndex:    event.ClauseIndex,
 		},
 	}
-	fe.Topics = make([]*thor.Bytes32, 0)
+	fe.Topics = make([]*workshare.Bytes32, 0)
 	for i := 0; i < 5; i++ {
 		if event.Topics[i] != nil {
 			fe.Topics = append(fe.Topics, event.Topics[i])
@@ -90,7 +90,7 @@ func (e *FilteredEvent) String() string {
 }
 
 type EventCriteria struct {
-	Address *thor.Address `json:"address"`
+	Address *workshare.Address `json:"address"`
 	TopicSet
 }
 
@@ -114,7 +114,7 @@ func convertEventFilter(chain *chain.Chain, filter *EventFilter) (*logdb.EventFi
 	if len(filter.CriteriaSet) > 0 {
 		criterias := make([]*logdb.EventCriteria, len(filter.CriteriaSet))
 		for i, criteria := range filter.CriteriaSet {
-			var topics [5]*thor.Bytes32
+			var topics [5]*workshare.Bytes32
 			topics[0] = criteria.Topic0
 			topics[1] = criteria.Topic1
 			topics[2] = criteria.Topic2

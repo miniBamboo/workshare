@@ -14,8 +14,8 @@ import (
 
 	sqlite3 "github.com/mattn/go-sqlite3"
 	"github.com/miniBamboo/workshare/block"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 const (
@@ -257,17 +257,17 @@ func (db *LogDB) queryEvents(ctx context.Context, query string, args ...interfac
 		event := &Event{
 			BlockNumber: seq.BlockNumber(),
 			Index:       seq.Index(),
-			BlockID:     thor.BytesToBytes32(blockID),
+			BlockID:     workshare.BytesToBytes32(blockID),
 			BlockTime:   blockTime,
-			TxID:        thor.BytesToBytes32(txID),
-			TxOrigin:    thor.BytesToAddress(txOrigin),
+			TxID:        workshare.BytesToBytes32(txID),
+			TxOrigin:    workshare.BytesToAddress(txOrigin),
 			ClauseIndex: clauseIndex,
-			Address:     thor.BytesToAddress(address),
+			Address:     workshare.BytesToAddress(address),
 			Data:        data,
 		}
 		for i, topic := range topics {
 			if len(topic) > 0 {
-				h := thor.BytesToBytes32(topic)
+				h := workshare.BytesToBytes32(topic)
 				event.Topics[i] = &h
 			}
 		}
@@ -319,13 +319,13 @@ func (db *LogDB) queryTransfers(ctx context.Context, query string, args ...inter
 		trans := &Transfer{
 			BlockNumber: seq.BlockNumber(),
 			Index:       seq.Index(),
-			BlockID:     thor.BytesToBytes32(blockID),
+			BlockID:     workshare.BytesToBytes32(blockID),
 			BlockTime:   blockTime,
-			TxID:        thor.BytesToBytes32(txID),
-			TxOrigin:    thor.BytesToAddress(txOrigin),
+			TxID:        workshare.BytesToBytes32(txID),
+			TxOrigin:    workshare.BytesToAddress(txOrigin),
 			ClauseIndex: clauseIndex,
-			Sender:      thor.BytesToAddress(sender),
-			Recipient:   thor.BytesToAddress(recipient),
+			Sender:      workshare.BytesToAddress(sender),
+			Recipient:   workshare.BytesToAddress(recipient),
 			Amount:      new(big.Int).SetBytes(amount),
 		}
 		transfers = append(transfers, trans)
@@ -337,7 +337,7 @@ func (db *LogDB) queryTransfers(ctx context.Context, query string, args ...inter
 }
 
 // NewestBlockID query newest written block id.
-func (db *LogDB) NewestBlockID() (thor.Bytes32, error) {
+func (db *LogDB) NewestBlockID() (workshare.Bytes32, error) {
 	var data []byte
 	row := db.stmtCache.MustPrepare(`SELECT MAX(data) FROM (
 			SELECT data FROM ref WHERE id=(SELECT blockId FROM transfer ORDER BY seq DESC LIMIT 1)
@@ -346,15 +346,15 @@ func (db *LogDB) NewestBlockID() (thor.Bytes32, error) {
 
 	if err := row.Scan(&data); err != nil {
 		if sql.ErrNoRows != err {
-			return thor.Bytes32{}, err
+			return workshare.Bytes32{}, err
 		}
 	}
 
-	return thor.BytesToBytes32(data), nil
+	return workshare.BytesToBytes32(data), nil
 }
 
 // HasBlockID query whether given block id related logs were written.
-func (db *LogDB) HasBlockID(id thor.Bytes32) (bool, error) {
+func (db *LogDB) HasBlockID(id workshare.Bytes32) (bool, error) {
 	const query = `SELECT COUNT(*) FROM (
 		SELECT * FROM (SELECT seq FROM transfer WHERE seq=? AND blockID=` + refIDQuery + ` LIMIT 1) 
 		UNION
@@ -380,7 +380,7 @@ func (db *LogDB) NewWriterSyncOff() *Writer {
 	return &Writer{conn: db.wconnSyncOff, stmtCache: db.stmtCache}
 }
 
-func topicValue(topics []thor.Bytes32, i int) []byte {
+func topicValue(topics []workshare.Bytes32, i int) []byte {
 	if i < len(topics) {
 		return topics[i][:]
 	}
@@ -442,8 +442,8 @@ func (w *Writer) Write(b *block.Block, receipts tx.Receipts) error {
 		}
 
 		var (
-			txID     thor.Bytes32
-			txOrigin thor.Address
+			txID     workshare.Bytes32
+			txOrigin workshare.Address
 		)
 		if i < len(txs) { // block 0 has no tx, but has receipts
 			tx := txs[i]

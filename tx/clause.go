@@ -11,11 +11,11 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type clauseBody struct {
-	To    *thor.Address `rlp:"nil"`
+	To    *workshare.Address `rlp:"nil"`
 	Value *big.Int
 	Data  []byte
 }
@@ -26,7 +26,7 @@ type Clause struct {
 }
 
 // NewClause create a new clause instance.
-func NewClause(to *thor.Address) *Clause {
+func NewClause(to *workshare.Address) *Clause {
 	if to != nil {
 		// make a copy of 'to'
 		cpy := *to
@@ -56,7 +56,7 @@ func (c *Clause) WithData(data []byte) *Clause {
 }
 
 // To returns 'To' address.
-func (c *Clause) To() *thor.Address {
+func (c *Clause) To() *workshare.Address {
 	if c.body.To == nil {
 		return nil
 	}

@@ -1,4 +1,4 @@
-// Copyright 2014 The go-ethereum Authors
+// Copyright 2014 The go-ethereum Auworkshares
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -23,14 +23,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 var (
 	// This is the known root hash of an empty trie.
-	emptyRoot = thor.Blake2b(rlp.EmptyString)
+	emptyRoot = workshare.Blake2b(rlp.EmptyString)
 	// This is the known hash of an empty state trie entry.
-	emptyState = thor.Blake2b(nil)
+	emptyState = workshare.Blake2b(nil)
 )
 
 // Database must be implemented by backing stores for the trie.
@@ -91,9 +91,9 @@ func (t *Trie) newFlag() nodeFlag {
 // trie is initially empty and does not require a database. Otherwise,
 // New will panic if db is nil and returns a MissingNodeError if root does
 // not exist in the database. Accessing the trie loads nodes from db on demand.
-func New(root thor.Bytes32, db Database) (*Trie, error) {
+func New(root workshare.Bytes32, db Database) (*Trie, error) {
 	trie := &Trie{db: db}
-	if (root != thor.Bytes32{}) && root != emptyRoot {
+	if (root != workshare.Bytes32{}) && root != emptyRoot {
 		if db == nil {
 			panic("trie.New: cannot use existing root without a database")
 		}
@@ -462,7 +462,7 @@ func (t *Trie) Root() []byte { return t.Hash().Bytes() }
 
 // Hash returns the root hash of the trie. It does not write to the
 // database and can be used even if the trie doesn't have one.
-func (t *Trie) Hash() thor.Bytes32 {
+func (t *Trie) Hash() workshare.Bytes32 {
 	hash, cached, _ := t.hashRoot(nil)
 	t.root = cached
 	return hash.(*hashNode).Hash
@@ -473,7 +473,7 @@ func (t *Trie) Hash() thor.Bytes32 {
 //
 // Committing flushes nodes from memory.
 // Subsequent Get calls will load nodes from the database.
-func (t *Trie) Commit() (root thor.Bytes32, err error) {
+func (t *Trie) Commit() (root workshare.Bytes32, err error) {
 	if t.db == nil {
 		panic("Commit called on trie with nil database")
 	}
@@ -487,10 +487,10 @@ func (t *Trie) Commit() (root thor.Bytes32, err error) {
 // load nodes from the trie's database. Calling code must ensure that
 // the changes made to db are written back to the trie's attached
 // database before using the trie.
-func (t *Trie) CommitTo(db DatabaseWriter) (root thor.Bytes32, err error) {
+func (t *Trie) CommitTo(db DatabaseWriter) (root workshare.Bytes32, err error) {
 	hash, cached, err := t.hashRoot(db)
 	if err != nil {
-		return (thor.Bytes32{}), err
+		return (workshare.Bytes32{}), err
 	}
 	t.root = cached
 	t.cacheGen++

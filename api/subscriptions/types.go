@@ -10,28 +10,28 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 //BlockMessage block piped by websocket
 type BlockMessage struct {
-	Number       uint32         `json:"number"`
-	ID           thor.Bytes32   `json:"id"`
-	Size         uint32         `json:"size"`
-	ParentID     thor.Bytes32   `json:"parentID"`
-	Timestamp    uint64         `json:"timestamp"`
-	GasLimit     uint64         `json:"gasLimit"`
-	Beneficiary  thor.Address   `json:"beneficiary"`
-	GasUsed      uint64         `json:"gasUsed"`
-	TotalScore   uint64         `json:"totalScore"`
-	TxsRoot      thor.Bytes32   `json:"txsRoot"`
-	TxsFeatures  uint32         `json:"txsFeatures"`
-	StateRoot    thor.Bytes32   `json:"stateRoot"`
-	ReceiptsRoot thor.Bytes32   `json:"receiptsRoot"`
-	Signer       thor.Address   `json:"signer"`
-	Transactions []thor.Bytes32 `json:"transactions"`
-	Obsolete     bool           `json:"obsolete"`
+	Number       uint32              `json:"number"`
+	ID           workshare.Bytes32   `json:"id"`
+	Size         uint32              `json:"size"`
+	ParentID     workshare.Bytes32   `json:"parentID"`
+	Timestamp    uint64              `json:"timestamp"`
+	GasLimit     uint64              `json:"gasLimit"`
+	Beneficiary  workshare.Address   `json:"beneficiary"`
+	GasUsed      uint64              `json:"gasUsed"`
+	TotalScore   uint64              `json:"totalScore"`
+	TxsRoot      workshare.Bytes32   `json:"txsRoot"`
+	TxsFeatures  uint32              `json:"txsFeatures"`
+	StateRoot    workshare.Bytes32   `json:"stateRoot"`
+	ReceiptsRoot workshare.Bytes32   `json:"receiptsRoot"`
+	Signer       workshare.Address   `json:"signer"`
+	Transactions []workshare.Bytes32 `json:"transactions"`
+	Obsolete     bool                `json:"obsolete"`
 }
 
 func convertBlock(b *chain.ExtendedBlock) (*BlockMessage, error) {
@@ -42,7 +42,7 @@ func convertBlock(b *chain.ExtendedBlock) (*BlockMessage, error) {
 	}
 
 	txs := b.Transactions()
-	txIds := make([]thor.Bytes32, len(txs))
+	txIds := make([]workshare.Bytes32, len(txs))
 	for i, tx := range txs {
 		txIds[i] = tx.ID()
 	}
@@ -67,18 +67,18 @@ func convertBlock(b *chain.ExtendedBlock) (*BlockMessage, error) {
 }
 
 type LogMeta struct {
-	BlockID        thor.Bytes32 `json:"blockID"`
-	BlockNumber    uint32       `json:"blockNumber"`
-	BlockTimestamp uint64       `json:"blockTimestamp"`
-	TxID           thor.Bytes32 `json:"txID"`
-	TxOrigin       thor.Address `json:"txOrigin"`
-	ClauseIndex    uint32       `json:"clauseIndex"`
+	BlockID        workshare.Bytes32 `json:"blockID"`
+	BlockNumber    uint32            `json:"blockNumber"`
+	BlockTimestamp uint64            `json:"blockTimestamp"`
+	TxID           workshare.Bytes32 `json:"txID"`
+	TxOrigin       workshare.Address `json:"txOrigin"`
+	ClauseIndex    uint32            `json:"clauseIndex"`
 }
 
 //TransferMessage transfer piped by websocket
 type TransferMessage struct {
-	Sender    thor.Address          `json:"sender"`
-	Recipient thor.Address          `json:"recipient"`
+	Sender    workshare.Address     `json:"sender"`
+	Recipient workshare.Address     `json:"recipient"`
 	Amount    *math.HexOrDecimal256 `json:"amount"`
 	Meta      LogMeta               `json:"meta"`
 	Obsolete  bool                  `json:"obsolete"`
@@ -108,11 +108,11 @@ func convertTransfer(header *block.Header, tx *tx.Transaction, clauseIndex uint3
 
 //EventMessage event piped by websocket
 type EventMessage struct {
-	Address  thor.Address   `json:"address"`
-	Topics   []thor.Bytes32 `json:"topics"`
-	Data     string         `json:"data"`
-	Meta     LogMeta        `json:"meta"`
-	Obsolete bool           `json:"obsolete"`
+	Address  workshare.Address   `json:"address"`
+	Topics   []workshare.Bytes32 `json:"topics"`
+	Data     string              `json:"data"`
+	Meta     LogMeta             `json:"meta"`
+	Obsolete bool                `json:"obsolete"`
 }
 
 func convertEvent(header *block.Header, tx *tx.Transaction, clauseIndex uint32, event *tx.Event, obsolete bool) (*EventMessage, error) {
@@ -138,12 +138,12 @@ func convertEvent(header *block.Header, tx *tx.Transaction, clauseIndex uint32, 
 
 // EventFilter contains options for contract event filtering.
 type EventFilter struct {
-	Address *thor.Address // restricts matches to events created by specific contracts
-	Topic0  *thor.Bytes32
-	Topic1  *thor.Bytes32
-	Topic2  *thor.Bytes32
-	Topic3  *thor.Bytes32
-	Topic4  *thor.Bytes32
+	Address *workshare.Address // restricts matches to events created by specific contracts
+	Topic0  *workshare.Bytes32
+	Topic1  *workshare.Bytes32
+	Topic2  *workshare.Bytes32
+	Topic3  *workshare.Bytes32
+	Topic4  *workshare.Bytes32
 }
 
 // Match returs whether event matches filter
@@ -152,7 +152,7 @@ func (ef *EventFilter) Match(event *tx.Event) bool {
 		return false
 	}
 
-	matchTopic := func(topic *thor.Bytes32, index int) bool {
+	matchTopic := func(topic *workshare.Bytes32, index int) bool {
 		if topic != nil {
 			if len(event.Topics) <= index {
 				return false
@@ -174,13 +174,13 @@ func (ef *EventFilter) Match(event *tx.Event) bool {
 
 // TransferFilter contains options for contract transfer filtering.
 type TransferFilter struct {
-	TxOrigin  *thor.Address // who send transaction
-	Sender    *thor.Address // who transferred tokens
-	Recipient *thor.Address // who received tokens
+	TxOrigin  *workshare.Address // who send transaction
+	Sender    *workshare.Address // who transferred tokens
+	Recipient *workshare.Address // who received tokens
 }
 
 // Match returs whether transfer matches filter
-func (tf *TransferFilter) Match(transfer *tx.Transfer, origin thor.Address) bool {
+func (tf *TransferFilter) Match(transfer *tx.Transfer, origin workshare.Address) bool {
 	if (tf.TxOrigin != nil) && (*tf.TxOrigin != origin) {
 		return false
 	}
@@ -196,24 +196,24 @@ func (tf *TransferFilter) Match(transfer *tx.Transfer, origin thor.Address) bool
 }
 
 type BeatMessage struct {
-	Number      uint32       `json:"number"`
-	ID          thor.Bytes32 `json:"id"`
-	ParentID    thor.Bytes32 `json:"parentID"`
-	Timestamp   uint64       `json:"timestamp"`
-	TxsFeatures uint32       `json:"txsFeatures"`
-	Bloom       string       `json:"bloom"`
-	K           uint32       `json:"k"`
-	Obsolete    bool         `json:"obsolete"`
+	Number      uint32            `json:"number"`
+	ID          workshare.Bytes32 `json:"id"`
+	ParentID    workshare.Bytes32 `json:"parentID"`
+	Timestamp   uint64            `json:"timestamp"`
+	TxsFeatures uint32            `json:"txsFeatures"`
+	Bloom       string            `json:"bloom"`
+	K           uint32            `json:"k"`
+	Obsolete    bool              `json:"obsolete"`
 }
 
 type Beat2Message struct {
-	Number      uint32       `json:"number"`
-	ID          thor.Bytes32 `json:"id"`
-	ParentID    thor.Bytes32 `json:"parentID"`
-	Timestamp   uint64       `json:"timestamp"`
-	TxsFeatures uint32       `json:"txsFeatures"`
-	GasLimit    uint64       `json:"gasLimit"`
-	Bloom       string       `json:"bloom"`
-	K           uint8        `json:"k"`
-	Obsolete    bool         `json:"obsolete"`
+	Number      uint32            `json:"number"`
+	ID          workshare.Bytes32 `json:"id"`
+	ParentID    workshare.Bytes32 `json:"parentID"`
+	Timestamp   uint64            `json:"timestamp"`
+	TxsFeatures uint32            `json:"txsFeatures"`
+	GasLimit    uint64            `json:"gasLimit"`
+	Bloom       string            `json:"bloom"`
+	K           uint8             `json:"k"`
+	Obsolete    bool              `json:"obsolete"`
 }

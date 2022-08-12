@@ -7,7 +7,7 @@ package subscriptions
 
 import (
 	"github.com/miniBamboo/workshare/chain"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 type transferReader struct {
@@ -16,7 +16,7 @@ type transferReader struct {
 	blockReader chain.BlockReader
 }
 
-func newTransferReader(repo *chain.Repository, position thor.Bytes32, filter *TransferFilter) *transferReader {
+func newTransferReader(repo *chain.Repository, position workshare.Bytes32, filter *TransferFilter) *transferReader {
 	return &transferReader{
 		repo:        repo,
 		filter:      filter,

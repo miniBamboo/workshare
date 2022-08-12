@@ -9,7 +9,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 
 	"github.com/miniBamboo/workshare/tx"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +20,7 @@ func TestBlockRef(t *testing.T) {
 
 	assert.Equal(t, tx.BlockRef{0, 0, 0, 0xff, 0, 0, 0, 0}, tx.NewBlockRef(0xff))
 
-	var bid thor.Bytes32
+	var bid workshare.Bytes32
 	rand.Read(bid[:])
 
 	br := tx.NewBlockRefFromID(bid)

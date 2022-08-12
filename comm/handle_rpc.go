@@ -14,8 +14,8 @@ import (
 	"github.com/miniBamboo/workshare/block"
 	"github.com/miniBamboo/workshare/comm/proto"
 	"github.com/miniBamboo/workshare/metric"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -54,7 +54,7 @@ func (c *Communicator) handleRPC(peer *Peer, msg *p2p.Msg, write func(interface{
 		c.newBlockFeed.Send(&NewBlockEvent{Block: newBlock})
 		write(&struct{}{})
 	case proto.MsgNewBlockID:
-		var newBlockID thor.Bytes32
+		var newBlockID workshare.Bytes32
 		if err := msg.Decode(&newBlockID); err != nil {
 			return errors.WithMessage(err, "decode msg")
 		}
@@ -73,7 +73,7 @@ func (c *Communicator) handleRPC(peer *Peer, msg *p2p.Msg, write func(interface{
 		_ = c.txPool.Add(newTx)
 		write(&struct{}{})
 	case proto.MsgGetBlockByID:
-		var blockID thor.Bytes32
+		var blockID workshare.Bytes32
 		if err := msg.Decode(&blockID); err != nil {
 			return errors.WithMessage(err, "decode msg")
 		}
@@ -99,7 +99,7 @@ func (c *Communicator) handleRPC(peer *Peer, msg *p2p.Msg, write func(interface{
 			if !c.repo.IsNotFound(err) {
 				log.Error("failed to get block id by number", "err", err)
 			}
-			write(thor.Bytes32{})
+			write(workshare.Bytes32{})
 		} else {
 			write(id)
 		}

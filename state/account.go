@@ -11,7 +11,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/miniBamboo/workshare/muxdb"
-	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/workshare"
 )
 
 // AccountMetadata is the account metadata.
@@ -59,7 +59,7 @@ func (a *Account) CalcEnergy(blockTime uint64) *big.Int {
 
 	x := new(big.Int).SetUint64(blockTime - a.BlockTime)
 	x.Mul(x, a.Balance)
-	x.Mul(x, thor.EnergyGrowthRate)
+	x.Mul(x, workshare.EnergyGrowthRate)
 	x.Div(x, bigE18)
 	return new(big.Int).Add(a.Energy, x)
 }
@@ -71,8 +71,8 @@ func emptyAccount() *Account {
 
 // loadAccount load an account object and its metadata by address in trie.
 // It returns empty account is no account found at the address.
-func loadAccount(trie *muxdb.Trie, addr thor.Address, steadyBlockNum uint32) (*Account, *AccountMetadata, error) {
-	hashedKey := thor.Blake2b(addr[:])
+func loadAccount(trie *muxdb.Trie, addr workshare.Address, steadyBlockNum uint32) (*Account, *AccountMetadata, error) {
+	hashedKey := workshare.Blake2b(addr[:])
 	data, meta, err := trie.FastGet(hashedKey[:], steadyBlockNum)
 	if err != nil {
 		return nil, nil, err
@@ -96,9 +96,9 @@ func loadAccount(trie *muxdb.Trie, addr thor.Address, steadyBlockNum uint32) (*A
 
 // saveAccount save account into trie at given address.
 // If the given account is empty, the value for given address is deleted.
-func saveAccount(trie *muxdb.Trie, addr thor.Address, a *Account, am *AccountMetadata) error {
+func saveAccount(trie *muxdb.Trie, addr workshare.Address, a *Account, am *AccountMetadata) error {
 	if a.IsEmpty() {
-		hashedKey := thor.Blake2b(addr[:])
+		hashedKey := workshare.Blake2b(addr[:])
 		// delete if account is empty
 		return trie.Update(hashedKey[:], nil, nil)
 	}
@@ -114,13 +114,13 @@ func saveAccount(trie *muxdb.Trie, addr thor.Address, a *Account, am *AccountMet
 			return err
 		}
 	}
-	hashedKey := thor.Blake2b(addr[:])
+	hashedKey := workshare.Blake2b(addr[:])
 	return trie.Update(hashedKey[:], data, mdata)
 }
 
 // loadStorage load storage data for given key.
-func loadStorage(trie *muxdb.Trie, key thor.Bytes32, steadyBlockNum uint32) (rlp.RawValue, error) {
-	hashedKey := thor.Blake2b(key[:])
+func loadStorage(trie *muxdb.Trie, key workshare.Bytes32, steadyBlockNum uint32) (rlp.RawValue, error) {
+	hashedKey := workshare.Blake2b(key[:])
 	v, _, err := trie.FastGet(
 		hashedKey[:],
 		steadyBlockNum)
@@ -129,8 +129,8 @@ func loadStorage(trie *muxdb.Trie, key thor.Bytes32, steadyBlockNum uint32) (rlp
 
 // saveStorage save value for given key.
 // If the data is zero, the given key will be deleted.
-func saveStorage(trie *muxdb.Trie, key thor.Bytes32, data rlp.RawValue) error {
-	hashedKey := thor.Blake2b(key[:])
+func saveStorage(trie *muxdb.Trie, key workshare.Bytes32, data rlp.RawValue) error {
+	hashedKey := workshare.Blake2b(key[:])
 	return trie.Update(
 		hashedKey[:],
 		data,

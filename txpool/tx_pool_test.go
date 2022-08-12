@@ -18,9 +18,9 @@ import (
 	"github.com/miniBamboo/workshare/genesis"
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tx"
 	Tx "github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -179,8 +179,8 @@ func TestAdd(t *testing.T) {
 	}{
 		{newTx(pool.repo.ChainTag(), nil, 21000, tx.NewBlockRef(10), 100, nil, Tx.Features(0), acc), "tx rejected: tx is not executable"},
 		{newTx(pool.repo.ChainTag(), nil, 21000, tx.NewBlockRef(100), 100, nil, Tx.Features(0), acc), "tx rejected: block ref out of schedule"},
-		{newTx(pool.repo.ChainTag(), nil, 21000, tx.BlockRef{}, 100, &thor.Bytes32{1}, Tx.Features(0), acc), "tx rejected: tx is not executable"},
-		{newTx(pool.repo.ChainTag(), nil, 21000, tx.BlockRef{}, 100, &thor.Bytes32{1}, Tx.Features(2), acc), "tx rejected: unsupported features"},
+		{newTx(pool.repo.ChainTag(), nil, 21000, tx.BlockRef{}, 100, &workshare.Bytes32{1}, Tx.Features(0), acc), "tx rejected: tx is not executable"},
+		{newTx(pool.repo.ChainTag(), nil, 21000, tx.BlockRef{}, 100, &workshare.Bytes32{1}, Tx.Features(2), acc), "tx rejected: unsupported features"},
 		{badReserved, "tx rejected: unsupported features"},
 	}
 

@@ -21,11 +21,11 @@ import (
 	"github.com/miniBamboo/workshare/muxdb"
 	"github.com/miniBamboo/workshare/runtime"
 	"github.com/miniBamboo/workshare/state"
-	"github.com/miniBamboo/workshare/thor"
 	"github.com/miniBamboo/workshare/tracers"
 	"github.com/miniBamboo/workshare/tracers/logger"
 	"github.com/miniBamboo/workshare/trie"
 	"github.com/miniBamboo/workshare/vm"
+	"github.com/miniBamboo/workshare/workshare"
 	"github.com/pkg/errors"
 )
 
@@ -34,10 +34,10 @@ var devNetGenesisID = genesis.NewDevnet().ID()
 type Debug struct {
 	repo       *chain.Repository
 	stater     *state.Stater
-	forkConfig thor.ForkConfig
+	forkConfig workshare.ForkConfig
 }
 
-func New(repo *chain.Repository, stater *state.Stater, forkConfig thor.ForkConfig) *Debug {
+func New(repo *chain.Repository, stater *state.Stater, forkConfig workshare.ForkConfig) *Debug {
 	return &Debug{
 		repo,
 		stater,
@@ -45,7 +45,7 @@ func New(repo *chain.Repository, stater *state.Stater, forkConfig thor.ForkConfi
 	}
 }
 
-func (d *Debug) handleTxEnv(ctx context.Context, blockID thor.Bytes32, txIndex uint64, clauseIndex uint64) (*runtime.Runtime, *runtime.TransactionExecutor, error) {
+func (d *Debug) handleTxEnv(ctx context.Context, blockID workshare.Bytes32, txIndex uint64, clauseIndex uint64) (*runtime.Runtime, *runtime.TransactionExecutor, error) {
 	block, err := d.repo.GetBlock(blockID)
 	if err != nil {
 		if d.repo.IsNotFound(err) {
@@ -100,7 +100,7 @@ func (d *Debug) handleTxEnv(ctx context.Context, blockID thor.Bytes32, txIndex u
 }
 
 //trace an existed transaction
-func (d *Debug) traceTransaction(ctx context.Context, tracer tracers.Tracer, blockID thor.Bytes32, txIndex uint64, clauseIndex uint64) (interface{}, error) {
+func (d *Debug) traceTransaction(ctx context.Context, tracer tracers.Tracer, blockID workshare.Bytes32, txIndex uint64, clauseIndex uint64) (interface{}, error) {
 	rt, txExec, err := d.handleTxEnv(ctx, blockID, txIndex, clauseIndex)
 	if err != nil {
 		return nil, err
@@ -150,7 +150,7 @@ func (d *Debug) handleTraceTransaction(w http.ResponseWriter, req *http.Request)
 	return utils.WriteJSON(w, res)
 }
 
-func (d *Debug) debugStorage(ctx context.Context, contractAddress thor.Address, blockID thor.Bytes32, txIndex uint64, clauseIndex uint64, keyStart []byte, maxResult int) (*StorageRangeResult, error) {
+func (d *Debug) debugStorage(ctx context.Context, contractAddress workshare.Address, blockID workshare.Bytes32, txIndex uint64, clauseIndex uint64, keyStart []byte, maxResult int) (*StorageRangeResult, error) {
 	rt, _, err := d.handleTxEnv(ctx, blockID, txIndex, clauseIndex)
 	if err != nil {
 		return nil, err
@@ -170,14 +170,14 @@ func storageRangeAt(t *muxdb.Trie, start []byte, maxResult int) (*StorageRangeRe
 		if err != nil {
 			return nil, err
 		}
-		v := thor.BytesToBytes32(content)
+		v := workshare.BytesToBytes32(content)
 		e := StorageEntry{Value: &v}
-		preimage := thor.BytesToBytes32(it.Meta)
+		preimage := workshare.BytesToBytes32(it.Meta)
 		e.Key = &preimage
-		result.Storage[thor.BytesToBytes32(it.Key).String()] = e
+		result.Storage[workshare.BytesToBytes32(it.Key).String()] = e
 	}
 	if it.Next() {
-		next := thor.BytesToBytes32(it.Key)
+		next := workshare.BytesToBytes32(it.Key)
 		result.NextKey = &next
 	}
 	return &result, nil
@@ -210,39 +210,39 @@ func (d *Debug) handleDebugStorage(w http.ResponseWriter, req *http.Request) err
 	return utils.WriteJSON(w, res)
 }
 
-func (d *Debug) parseTarget(target string) (blockID thor.Bytes32, txIndex uint64, clauseIndex uint64, err error) {
+func (d *Debug) parseTarget(target string) (blockID workshare.Bytes32, txIndex uint64, clauseIndex uint64, err error) {
 	parts := strings.Split(target, "/")
 	if len(parts) != 3 {
-		return thor.Bytes32{}, 0, 0, utils.BadRequest(errors.New("target:" + target + " unsupported"))
+		return workshare.Bytes32{}, 0, 0, utils.BadRequest(errors.New("target:" + target + " unsupported"))
 	}
-	blockID, err = thor.ParseBytes32(parts[0])
+	blockID, err = workshare.ParseBytes32(parts[0])
 	if err != nil {
-		return thor.Bytes32{}, 0, 0, utils.BadRequest(errors.WithMessage(err, "target[0]"))
+		return workshare.Bytes32{}, 0, 0, utils.BadRequest(errors.WithMessage(err, "target[0]"))
 	}
 	if len(parts[1]) == 64 || len(parts[1]) == 66 {
-		txID, err := thor.ParseBytes32(parts[1])
+		txID, err := workshare.ParseBytes32(parts[1])
 		if err != nil {
-			return thor.Bytes32{}, 0, 0, utils.BadRequest(errors.WithMessage(err, "target[1]"))
+			return workshare.Bytes32{}, 0, 0, utils.BadRequest(errors.WithMessage(err, "target[1]"))
 		}
 
 		txMeta, err := d.repo.NewChain(blockID).GetTransactionMeta(txID)
 		if err != nil {
 			if d.repo.IsNotFound(err) {
-				return thor.Bytes32{}, 0, 0, utils.Forbidden(errors.New("transaction not found"))
+				return workshare.Bytes32{}, 0, 0, utils.Forbidden(errors.New("transaction not found"))
 			}
-			return thor.Bytes32{}, 0, 0, err
+			return workshare.Bytes32{}, 0, 0, err
 		}
 		txIndex = txMeta.Index
 	} else {
 		i, err := strconv.ParseUint(parts[1], 0, 0)
 		if err != nil {
-			return thor.Bytes32{}, 0, 0, utils.BadRequest(errors.WithMessage(err, "target[1]"))
+			return workshare.Bytes32{}, 0, 0, utils.BadRequest(errors.WithMessage(err, "target[1]"))
 		}
 		txIndex = i
 	}
 	clauseIndex, err = strconv.ParseUint(parts[2], 0, 0)
 	if err != nil {
-		return thor.Bytes32{}, 0, 0, utils.BadRequest(errors.WithMessage(err, "target[2]"))
+		return workshare.Bytes32{}, 0, 0, utils.BadRequest(errors.WithMessage(err, "target[2]"))
 	}
 	return
 }

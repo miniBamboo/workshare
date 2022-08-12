@@ -16,8 +16,8 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/p2p/netutil"
+	"github.com/miniBamboo/workshare/p2psrv/discv5"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/p2psrv/discv5"
 	cli "gopkg.in/urfave/cli.v1"
 )
 

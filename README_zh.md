@@ -73,7 +73,7 @@ If no error reported, all built executable binaries will appear in folder *bin*.
 Connect to Workshare's mainnet:
 
 ```
-bin/lorkshare --network main
+bin/workshare --network main
 ```
 
 

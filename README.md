@@ -160,7 +160,7 @@ Do not forget to add the `--api-addr 0.0.0.0:51991` flag if you want other conta
 
 ## API
 
-Once `luckyshare` started, online *OpenAPI* doc can be accessed in your browser. e.g. http://localhost:51991/ by default.
+Once `workshare` started, online *OpenAPI* doc can be accessed in your browser. e.g. http://localhost:51991/ by default.
 
 
 

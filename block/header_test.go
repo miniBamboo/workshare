@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 func TestHeader_BetterThan(t *testing.T) {

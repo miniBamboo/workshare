@@ -10,10 +10,10 @@ import (
 	"encoding/binary"
 
 	"github.com/inconshreveable/log15"
+	"github.com/miniBamboo/workshare/kv"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/trie"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/kv"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/trie"
 )
 
 var log = log15.New("pkg", "muxdb.trie")

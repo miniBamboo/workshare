@@ -8,8 +8,8 @@ package cache_test
 import (
 	"testing"
 
+	"github.com/miniBamboo/workshare/cache"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/cache"
 )
 
 func TestRandCacheAddRemove(t *testing.T) {

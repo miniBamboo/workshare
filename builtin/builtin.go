@@ -6,16 +6,16 @@
 package builtin
 
 import (
+	"github.com/miniBamboo/workshare/abi"
+	"github.com/miniBamboo/workshare/builtin/authority"
+	"github.com/miniBamboo/workshare/builtin/energy"
+	"github.com/miniBamboo/workshare/builtin/gen"
+	"github.com/miniBamboo/workshare/builtin/params"
+	"github.com/miniBamboo/workshare/builtin/prototype"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/xenv"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/abi"
-	"github.com/vechain/thor/builtin/authority"
-	"github.com/vechain/thor/builtin/energy"
-	"github.com/vechain/thor/builtin/gen"
-	"github.com/vechain/thor/builtin/params"
-	"github.com/vechain/thor/builtin/prototype"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/xenv"
 )
 
 // Builtin contracts binding.

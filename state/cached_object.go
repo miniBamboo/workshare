@@ -8,8 +8,8 @@ package state
 import (
 	"github.com/ethereum/go-ethereum/rlp"
 	lru "github.com/hashicorp/golang-lru"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 var codeCache, _ = lru.NewARC(512)

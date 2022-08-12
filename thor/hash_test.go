@@ -11,7 +11,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/thor"
 	"golang.org/x/crypto/sha3"
 )
 

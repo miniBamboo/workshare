@@ -13,14 +13,14 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/miniBamboo/workshare/api/node"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/comm"
+	"github.com/miniBamboo/workshare/genesis"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/txpool"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/api/node"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/comm"
-	"github.com/vechain/thor/genesis"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/txpool"
 )
 
 var ts *httptest.Server

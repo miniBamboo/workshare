@@ -11,13 +11,13 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	ethparams "github.com/ethereum/go-ethereum/params"
+	"github.com/miniBamboo/workshare/abi"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/vm"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/abi"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
-	"github.com/vechain/thor/vm"
 )
 
 // BlockContext block context.

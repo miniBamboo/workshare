@@ -25,8 +25,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/miniBamboo/workshare/thor"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/thor"
 )
 
 // makeTestTrie create a sample test trie to test node-wise reconstruction.

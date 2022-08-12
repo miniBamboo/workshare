@@ -9,11 +9,11 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/miniBamboo/workshare/builtin/prototype"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/builtin/prototype"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
 )
 
 func M(a ...interface{}) []interface{} {

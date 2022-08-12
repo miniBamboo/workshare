@@ -10,10 +10,10 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/miniBamboo/workshare/abi"
+	"github.com/miniBamboo/workshare/builtin/gen"
+	"github.com/miniBamboo/workshare/thor"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/abi"
-	"github.com/vechain/thor/builtin/gen"
-	"github.com/vechain/thor/thor"
 )
 
 func TestABI(t *testing.T) {

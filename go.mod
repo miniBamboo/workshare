@@ -1,4 +1,4 @@
-module github.com/vechain/thor
+module github.com/miniBamboo/workshare
 
 go 1.16
 

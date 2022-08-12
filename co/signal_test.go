@@ -8,8 +8,8 @@ package co_test
 import (
 	"testing"
 
+	"github.com/miniBamboo/workshare/co"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/co"
 )
 
 func TestSignal_SignalBeforeWait(t *testing.T) {

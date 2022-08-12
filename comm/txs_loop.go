@@ -6,8 +6,8 @@
 package comm
 
 import (
-	"github.com/vechain/thor/comm/proto"
-	"github.com/vechain/thor/txpool"
+	"github.com/miniBamboo/workshare/comm/proto"
+	"github.com/miniBamboo/workshare/txpool"
 )
 
 func (c *Communicator) txsLoop() {

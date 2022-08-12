@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/miniBamboo/workshare/trie"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/trie"
 )
 
 func TestLeafbank(t *testing.T) {

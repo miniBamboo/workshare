@@ -4,7 +4,7 @@ import (
 	"bytes"
 
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 // see "github.com/ethereum/go-ethereum/types/derive_sha.go"

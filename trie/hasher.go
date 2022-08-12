@@ -20,8 +20,8 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/vechain/thor/lowrlp"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/lowrlp"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 type hasher struct {

@@ -9,15 +9,15 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
+	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/genesis"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/runtime"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/builtin"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/genesis"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/runtime"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
 )
 
 func TestResolvedTx(t *testing.T) {

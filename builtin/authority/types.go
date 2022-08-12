@@ -6,7 +6,7 @@
 package authority
 
 import (
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 type (

@@ -11,10 +11,10 @@ import (
 	"sync/atomic"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/vechain/thor/builtin"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
+	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
 )
 
 // DevAccount account for development.

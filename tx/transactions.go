@@ -7,8 +7,8 @@ package tx
 
 import (
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/trie"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/trie"
 )
 
 var (

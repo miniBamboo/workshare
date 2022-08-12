@@ -8,9 +8,9 @@ package comm
 import (
 	"github.com/ethereum/go-ethereum/p2p/discover"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/comm/proto"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/comm/proto"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 type announcement struct {

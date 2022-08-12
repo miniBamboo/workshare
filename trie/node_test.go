@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 // func TestCanUnload(t *testing.T) {

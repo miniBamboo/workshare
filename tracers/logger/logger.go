@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/holiman/uint256"
-	"github.com/vechain/thor/vm"
+	"github.com/miniBamboo/workshare/vm"
 )
 
 // Storage represents a contract's storage.

@@ -6,15 +6,15 @@
 package packer
 
 import (
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/builtin"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/poa"
-	"github.com/vechain/thor/runtime"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
-	"github.com/vechain/thor/xenv"
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/poa"
+	"github.com/miniBamboo/workshare/runtime"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
+	"github.com/miniBamboo/workshare/xenv"
 )
 
 // Packer to pack txs and build new blocks.

@@ -1,4 +1,4 @@
-PACKAGE = github.com/vechain/thor
+PACKAGE = github.com/miniBamboo/workshare
 
 GIT_COMMIT = $(shell git --no-pager log --pretty="%h" -n 1)
 GIT_TAG = $(shell git tag -l --points-at HEAD)

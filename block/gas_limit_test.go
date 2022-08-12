@@ -9,9 +9,9 @@ import (
 	"math"
 	"testing"
 
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/thor"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/thor"
 )
 
 func TestGasLimit_IsValid(t *testing.T) {

@@ -15,7 +15,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/vechain/thor/vrf"
+	"github.com/miniBamboo/workshare/vrf"
 )
 
 // Case Testing cases structure.

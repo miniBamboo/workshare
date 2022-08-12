@@ -12,8 +12,8 @@ import (
 	"time"
 
 	lru "github.com/hashicorp/golang-lru"
+	"github.com/miniBamboo/workshare/trie"
 	"github.com/qianbin/directcache"
-	"github.com/vechain/thor/trie"
 )
 
 // Cache is the cache layer for trie.

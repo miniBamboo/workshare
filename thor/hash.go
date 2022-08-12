@@ -10,7 +10,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/vechain/thor/blake2b"
+	"github.com/miniBamboo/workshare/blake2b"
 )
 
 // NewBlake2b return blake2b-256 hash.

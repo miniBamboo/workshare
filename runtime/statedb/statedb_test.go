@@ -19,10 +19,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/runtime/statedb"
-	State "github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/runtime/statedb"
+	State "github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 func TestSnapshotRandom(t *testing.T) {

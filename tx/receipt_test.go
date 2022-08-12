@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	. "github.com/vechain/thor/tx"
+	. "github.com/miniBamboo/workshare/tx"
 )
 
 func TestReceipt(t *testing.T) {

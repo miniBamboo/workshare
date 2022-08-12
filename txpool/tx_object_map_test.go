@@ -9,10 +9,10 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/miniBamboo/workshare/genesis"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/tx"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/genesis"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/tx"
 )
 
 func TestTxObjMap(t *testing.T) {

@@ -6,9 +6,9 @@
 package poa
 
 import (
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 var epochInterval uint32 = thor.EpochInterval

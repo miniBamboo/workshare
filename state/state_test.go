@@ -11,9 +11,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/thor"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/thor"
 )
 
 func TestStateReadWrite(t *testing.T) {

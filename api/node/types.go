@@ -6,8 +6,8 @@
 package node
 
 import (
-	"github.com/vechain/thor/comm"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/comm"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 type Network interface {

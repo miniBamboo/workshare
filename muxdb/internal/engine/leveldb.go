@@ -8,10 +8,10 @@ package engine
 import (
 	"sync"
 
+	"github.com/miniBamboo/workshare/kv"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
-	"github.com/vechain/thor/kv"
 )
 
 var (

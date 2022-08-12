@@ -16,15 +16,15 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/gorilla/mux"
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/genesis"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/packer"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/genesis"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/packer"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
 )
 
 const (

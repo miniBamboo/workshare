@@ -10,14 +10,14 @@ import (
 	"sort"
 
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/kv"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/trie"
+	"github.com/miniBamboo/workshare/tx"
 	"github.com/pkg/errors"
 	"github.com/syndtr/goleveldb/leveldb/util"
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/kv"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/trie"
-	"github.com/vechain/thor/tx"
 )
 
 const (

@@ -6,8 +6,8 @@
 package subscriptions
 
 import (
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 type blockReader struct {

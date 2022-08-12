@@ -13,16 +13,16 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/miniBamboo/workshare/builtin"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/consensus"
+	"github.com/miniBamboo/workshare/genesis"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/packer"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/builtin"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/consensus"
-	"github.com/vechain/thor/genesis"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/packer"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
 )
 
 func M(args ...interface{}) []interface{} {

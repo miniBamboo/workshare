@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/miniBamboo/workshare/cache"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/cache"
 )
 
 func TestPrioCacheAddRemove(t *testing.T) {

@@ -12,11 +12,11 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/miniBamboo/workshare/block"
+	logdb "github.com/miniBamboo/workshare/logdb"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/block"
-	logdb "github.com/vechain/thor/logdb"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
 )
 
 func newTx() *tx.Transaction {

@@ -6,7 +6,7 @@
 package poa
 
 import (
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 // Proposer address with status.

@@ -11,12 +11,12 @@ import (
 
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/comm/proto"
+	"github.com/miniBamboo/workshare/metric"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/comm/proto"
-	"github.com/vechain/thor/metric"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
 )
 
 // peer will be disconnected if error returned

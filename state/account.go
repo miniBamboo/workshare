@@ -10,8 +10,8 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 // AccountMetadata is the account metadata.

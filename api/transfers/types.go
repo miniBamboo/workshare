@@ -7,9 +7,9 @@ package transfers
 
 import (
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/vechain/thor/api/events"
-	"github.com/vechain/thor/logdb"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/api/events"
+	"github.com/miniBamboo/workshare/logdb"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 type LogMeta struct {

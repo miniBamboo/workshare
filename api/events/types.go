@@ -10,10 +10,10 @@ import (
 	"math"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/logdb"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/logdb"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 type LogMeta struct {

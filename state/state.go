@@ -12,10 +12,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/vechain/thor/lowrlp"
-	"github.com/vechain/thor/muxdb"
-	"github.com/vechain/thor/stackedmap"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/lowrlp"
+	"github.com/miniBamboo/workshare/muxdb"
+	"github.com/miniBamboo/workshare/stackedmap"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 const (

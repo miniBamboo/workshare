@@ -3,8 +3,8 @@ package tx_test
 import (
 	"testing"
 
+	"github.com/miniBamboo/workshare/tx"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/tx"
 )
 
 func TestFeatures(t *testing.T) {

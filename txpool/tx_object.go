@@ -10,13 +10,13 @@ import (
 	"sort"
 	"time"
 
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/runtime"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/runtime"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
 )
 
 type txObject struct {

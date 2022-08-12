@@ -10,12 +10,12 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/miniBamboo/workshare/muxdb/internal/engine"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/trie"
 	"github.com/stretchr/testify/assert"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/storage"
-	"github.com/vechain/thor/muxdb/internal/engine"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/trie"
 )
 
 func newEngine() engine.Engine {

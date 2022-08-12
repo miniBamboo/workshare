@@ -6,7 +6,7 @@
 package trie
 
 import (
-	"github.com/vechain/thor/lowrlp"
+	"github.com/miniBamboo/workshare/lowrlp"
 )
 
 // implements node.encode and node.encodeTrailing

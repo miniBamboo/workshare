@@ -10,11 +10,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/miniBamboo/workshare/api/events"
+	"github.com/miniBamboo/workshare/api/utils"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/logdb"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/api/events"
-	"github.com/vechain/thor/api/utils"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/logdb"
 )
 
 type Transfers struct {

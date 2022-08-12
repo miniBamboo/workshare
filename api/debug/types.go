@@ -3,7 +3,7 @@ package debug
 import (
 	"encoding/json"
 
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 type TracerOption struct {

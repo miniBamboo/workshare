@@ -11,9 +11,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/rlp"
 	lru "github.com/hashicorp/golang-lru"
+	"github.com/miniBamboo/workshare/kv"
+	"github.com/miniBamboo/workshare/trie"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/kv"
-	"github.com/vechain/thor/trie"
 )
 
 const (

@@ -6,11 +6,11 @@
 package genesis
 
 import (
-	"github.com/vechain/thor/abi"
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/state"
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/tx"
+	"github.com/miniBamboo/workshare/abi"
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/state"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/tx"
 )
 
 // Genesis to build genesis block.

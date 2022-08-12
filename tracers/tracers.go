@@ -21,8 +21,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/vechain/thor/thor"
-	"github.com/vechain/thor/vm"
+	"github.com/miniBamboo/workshare/thor"
+	"github.com/miniBamboo/workshare/vm"
 )
 
 // Context contains some contextual infos for a transaction execution that is not

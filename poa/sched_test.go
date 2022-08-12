@@ -9,10 +9,10 @@ import (
 	"encoding/binary"
 	"testing"
 
+	"github.com/miniBamboo/workshare/block"
+	"github.com/miniBamboo/workshare/poa"
+	"github.com/miniBamboo/workshare/thor"
 	"github.com/stretchr/testify/assert"
-	"github.com/vechain/thor/block"
-	"github.com/vechain/thor/poa"
-	"github.com/vechain/thor/thor"
 )
 
 var (

@@ -8,10 +8,10 @@ package builtin
 import (
 	"encoding/hex"
 
+	"github.com/miniBamboo/workshare/abi"
+	"github.com/miniBamboo/workshare/builtin/gen"
+	"github.com/miniBamboo/workshare/thor"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/abi"
-	"github.com/vechain/thor/builtin/gen"
-	"github.com/vechain/thor/thor"
 )
 
 type contract struct {

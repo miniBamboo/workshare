@@ -38,7 +38,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/vechain/thor/tracers"
+	"github.com/miniBamboo/workshare/tracers"
 )
 
 // init registers itself this packages as a lookup for tracers.

@@ -11,10 +11,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/gorilla/mux"
+	"github.com/miniBamboo/workshare/api/utils"
+	"github.com/miniBamboo/workshare/chain"
+	"github.com/miniBamboo/workshare/thor"
 	"github.com/pkg/errors"
-	"github.com/vechain/thor/api/utils"
-	"github.com/vechain/thor/chain"
-	"github.com/vechain/thor/thor"
 )
 
 type Blocks struct {

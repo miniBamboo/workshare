@@ -8,9 +8,9 @@ package accounts
 import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/vechain/thor/api/transactions"
-	"github.com/vechain/thor/runtime"
-	"github.com/vechain/thor/thor"
+	"github.com/miniBamboo/workshare/api/transactions"
+	"github.com/miniBamboo/workshare/runtime"
+	"github.com/miniBamboo/workshare/thor"
 )
 
 //Account for marshal account
